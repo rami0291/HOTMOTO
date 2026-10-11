@@ -13,7 +13,6 @@
     "./brand/*": "./brand/*"
   },
   "dependencies": {
-    "@hotmoto/china": "*",
-    "@hotmoto/market": "*"
+    "@hotmoto/china": "*"
   }
 }

@@ -3,6 +3,5 @@
 // pages' parts. Each list keeps the order its entries appear in on the site.
 import type { ModuleDeclaration } from "@hotmoto/contracts/modules";
 import china from "@hotmoto/china/module";
-import market from "@hotmoto/market/module";
 
-export const MODULES: readonly ModuleDeclaration[] = [china, market];
+export const MODULES: readonly ModuleDeclaration[] = [china];
