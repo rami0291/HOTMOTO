@@ -101,7 +101,14 @@ export function pageMeta(input: PageMetaInput): MetaDescriptor[] {
     { name: "twitter:description", content: description },
     { name: "twitter:image", content: image },
   ];
-  if (input.noindex) tags.push({ name: "robots", content: input.nofollow ? "noindex, nofollow" : "noindex, follow" });
+  if (input.noindex) {
+    tags.push({ name: "robots", content: input.nofollow ? "noindex, nofollow" : "noindex, follow" });
+  } else {
+    tags.push({ name: "robots", content: "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" });
+  }
+  if (SITE.keywords?.length) {
+    tags.push({ name: "keywords", content: SITE.keywords.join(", ") });
+  }
   if (input.jsonLd) tags.push({ "script:ld+json": input.jsonLd });
   return tags;
 }
@@ -116,6 +123,7 @@ export function organizationLd() {
     name: SITE.organization.name,
     url: base,
     logo: `${base}/icon.png`,
+    ...(SITE.github ? { sameAs: [SITE.github] } : {}),
     ...(founder ? {
       founder: {
         "@type": "Person",
@@ -153,10 +161,19 @@ export function siteLd() {
       "@type": "WebSite",
       "@id": `${base}/#website`,
       name: SITE.name,
+      alternateName: [SITE.tagline, `${SITE.name} 二輪ニュース`],
       url: base,
       description: SITE_DESCRIPTION,
       inLanguage: SITE.locale,
       publisher: orgRef(),
+      potentialAction: {
+        "@type": "SearchAction",
+        target: {
+          "@type": "EntryPoint",
+          urlTemplate: `${base}/all?q={search_term_string}`,
+        },
+        "query-input": "required name=search_term_string",
+      },
     },
     {
       "@context": "https://schema.org",
@@ -179,6 +196,7 @@ export function siteLd() {
         { "@type": "DataDownload", name: `${withSubject("月報")} RSS`, encodingFormat: "application/rss+xml", contentUrl: `${base}/feed/monthly.xml` },
         { "@type": "DataDownload", name: "公開 API v1", encodingFormat: "application/json", contentUrl: `${base}/api/v1/items` },
         { "@type": "DataDownload", name: "OpenAPI", encodingFormat: "application/json", contentUrl: `${base}/openapi-v1.json` },
+        { "@type": "DataDownload", name: "LLM Context", encodingFormat: "text/plain", contentUrl: `${base}/llms.txt` },
       ],
     },
   ];
@@ -214,6 +232,7 @@ export function articleLd(input: { path: string; headline: string; description?:
     url,
     headline: input.headline.slice(0, 110),
     ...(description ? { description: description.slice(0, 300) } : {}),
+    image: [`${base}/og/site.png`],
     inLanguage: SITE.locale,
     ...(input.publishedAt ? { datePublished: input.publishedAt, dateModified: input.modifiedAt ?? input.publishedAt } : {}),
     ...(input.section?.length ? { articleSection: input.section } : {}),

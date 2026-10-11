@@ -22,6 +22,7 @@ AGENTS.md と docs/customize.md を読んで、このサイトを「○○業界
 - `mcpPrefix`：MCP ツール名の接頭辞。`hotmoto` なら `hotmoto_get_latest` になります。誰かが接続した後は変えないでください。
 - `interfaceVersion`：公開インターフェース（MCP、OpenAPI、`llms.txt`）のバージョン。上げるだけで下げません。既存の項目や意味を変えたらメジャーを上げます。
 - `crawlerName`：情報源を取得するときに名乗る名前。他人のサイト名を使わないでください。
+- `googleAnalyticsId`：Google Analytics 測定 ID（`G-XXXXXXXXXX`、任意）。設定すると全公開ページで gtag.js を読み込みます。
 - `icp`：中国本土のサイトの届出番号（日本のサイトでは不要）。
 - `github`：ソースコードのリポジトリのアドレス（任意）。入れるとサイドバーと「マイページ」の下に表示されます。
 - `llmsIntro`：`llms.txt` の一言紹介の下の詳しい紹介（任意）。

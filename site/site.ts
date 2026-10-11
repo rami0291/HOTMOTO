@@ -37,15 +37,31 @@ export const SITE = {
   /** フィードバックフォームの入力欄の例文。 */
   feedbackExample: "例：あるキーワードで検索したところ……本当は……を探していました",
   /** 一言紹介：検索エンジン、シェアカード、RSS、llms.txt で使う。 */
-  description: "国内外のメーカー発表、業界統計、二輪メディアを自動で見張り、モデルが要約・採点・厳選。同じ出来事の報道を一つにまとめ、二輪市場のHOT POINTSを毎朝の日報で定点観測します。",
+  description: "国内外の主要バイクメーカー公式発表、二輪車新車・中古車販売台数統計、国内外二輪メディアを自動で見張り、AIが要約・採点・厳選。同じ出来事の報道を時系列に集約し、二輪市場のHOT POINTSを毎朝08:00の日報で定点観測します。",
   /** llms.txt の一言紹介の下に入る詳しい紹介（任意）。 */
-  llmsIntro: null as string | null,
+  llmsIntro: "HOTMOTOは、日本の二輪（オートバイ・バイク・原付・電動モビリティ）業界およびグローバル二輪市場のニュース・公式発表・登録販売統計を対象とする専門インテリジェンスプラットフォームです。ホンダ、ヤマハ、スズキ、カワサキをはじめとする国内外メーカーの新型車発表、国土交通省や警察庁のリコール・法規制政策、MotoGP等のモータースポーツ、市場動向データを網羅し、客観的な事実と出典を提供します。",
   /** 小さな一行：シェア画像やポスターの下部。 */
   tagline: "二輪市場のHOT POINTSを定点観測",
   /** 検索エンジンが読むキーワード（トップページの構造化データ）。 */
-  keywords: ["バイクニュース", "二輪ニュース", "オートバイ", "二輪市場", "バイク新型車", "二輪販売台数"] as string[],
+  keywords: [
+    "HOTMOTO",
+    "バイクニュース",
+    "二輪ニュース",
+    "オートバイ",
+    "二輪市場",
+    "バイク新型車",
+    "二輪販売台数",
+    "バイク速報",
+    "リコール情報",
+    "MotoGP",
+    "ホンダ バイク",
+    "ヤマハ バイク",
+    "スズキ バイク",
+    "カワサキ バイク",
+    "電動バイク"
+  ] as string[],
   /** サイトが収録を始めた年（構造化データの期間、任意）。 */
-  since: null as string | null,
+  since: "2026",
   /** 画面の言語（HTML lang、og:locale）。 */
   locale: "ja-JP",
   /**
@@ -55,6 +71,8 @@ export const SITE = {
   language: "ja" as "ja" | "zh",
   /** 既定のドメイン。SITE_URL が設定されていないときだけ使う。 */
   defaultUrl: "http://localhost:3000",
+  /** Google Analytics 測定 ID（G-XXXXXXXXXX、任意）。設定すると全公開ページで gtag.js を読み込む。 */
+  googleAnalyticsId: "G-92MVY4038X" as string | null,
   /** 標準アイコン（favicon.ico、icon.png、icon-192.png、apple-icon.png、logo.svg）以外にサイトのルートに置くアイコン。site/brand/ のファイル名（任意）。manifest.webmanifest や外部サイトが参照するときに使う。 */
   rootIcons: [] as string[],
   /**
@@ -74,12 +92,16 @@ export const SITE = {
   /** 中国本土のサイトの ICP 届出番号（任意）。入れるとフッターに表示し、工業情報化部の届出システムにリンクする。 */
   icp: null as string | null,
   /** ソースコードの GitHub リポジトリ（任意）。入れるとサイドバー下部と「マイページ」下部に「GitHub でオープンソース」と表示する。 */
-  github: null as string | null,
+  github: "https://github.com/rami0291/HOTMOTO" as string | null,
   /** 構造化データの運営者（検索エンジン向け）。 */
   organization: {
-    name: "Rami/HOTMOTO",
+    name: "HOTMOTO",
     /** 創設者（任意）。 */
-    founder: null as null | { name: string; alternateName?: string; jobTitle?: string; description?: string; url?: string },
+    founder: {
+      name: "Rami",
+      alternateName: "Ramirez",
+      url: "https://github.com/rami0291",
+    } as null | { name: string; alternateName?: string; jobTitle?: string; description?: string; url?: string },
   },
   /** 情報源を取得するときに名乗る名前とバージョン（User-Agent に入る）。他のサイトを名乗らない。 */
   crawlerName: "HOTMOTOBot/1.0",
@@ -92,7 +114,7 @@ export const POLICY = {
     name: "利用規約",
     description: "本サイトのウェブサイト、RSS、公開 API、MCP の利用規約。",
     /** llms.txt でこのページを説明する一文（任意）。 */
-    covers: null as string | null,
+    covers: "本サイトのウェブサイト、RSS、公開 API、MCP サーバーの利用条件と著作権の取扱い。" as string | null,
     /** Agent 接続ページの RSS・API 欄でそれぞれ示す利用上の注意（任意）。 */
     notes: null as null | { rss: string; api: string },
     /**
@@ -111,7 +133,7 @@ export const POLICY = {
     name: "プライバシーポリシー",
     description: "本サイトがブラウザ内のデータ、フィードバック、アクセスログをどう扱うか。",
     /** llms.txt でこのページを説明する一文（任意）。 */
-    covers: null as string | null,
+    covers: "アクセス解析（Google Analytics）、クッキー利用、ログの取扱い方針。" as string | null,
   },
   /**
    * X の投稿そのものの文字と画像を全文として扱うか：扱うなら、全文表示が許可された記事（情報源が全文を許可し、
@@ -269,7 +291,6 @@ export const ACCESS = {
 
 /** このデプロイ自身の取り決め（任意）。 */
 export const DEPLOYMENT = {
-  /** 認証情報のグループファイル（models.env、collectors.env……）を置く既定のディレクトリ（リポジトリのルートからの相対パス）。環境変数 hotmoto_CREDENTIALS_DIR が優先し、どちらもなければ環境変数だけを読む。 */
   /** 認証情報のグループファイル（models.env、collectors.env……）を置く既定のディレクトリ（リポジトリのルートからの相対パス）。環境変数 hotmoto_CREDENTIALS_DIR が優先し、どちらもなければ環境変数だけを読む。 */
   credentialsDir: null as string | null,
   /** 認証情報グループのファイル名（認証情報ディレクトリの下、任意）。書いていないグループは「グループ名.env」。例：models.env。 */

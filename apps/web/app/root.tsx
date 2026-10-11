@@ -27,19 +27,22 @@ export const links: Route.LinksFunction = () => [
   { rel: "apple-touch-icon", href: "/apple-icon.png" },
   { rel: "manifest", href: "/manifest.webmanifest" },
   { rel: "alternate", type: "application/rss+xml", title: `${SITE.name} — 厳選`, href: "/feed.xml" },
+  { rel: "alternate", type: "text/plain", title: `${SITE.name} — LLM context (llms.txt)`, href: "/llms.txt" },
 ];
 
 /** The release rendering this document: once a newer one is deployed, a render error reloads the page (entry.client). */
 export async function loader({ request }: Route.LoaderArgs) {
   const release = process.env.hotmoto_RELEASE ?? null;
+  const envGaId = process.env.GOOGLE_ANALYTICS_ID?.trim();
+  const gaId = envGaId === "disabled" || envGaId === "off" ? null : (envGaId || SITE.googleAnalyticsId || null);
   try {
     const meta = await apiGet<SiteMeta>("/api/site/meta", {
       headers: Object.assign({}, ...webModules().map((m) => m.root?.documentHeaders?.(request) ?? {})),
       signal: request.signal,
     });
-    return { ...meta, release };
+    return { ...meta, release, gaId };
   } catch {
-    return { changelogVersion: null, release };
+    return { changelogVersion: null, release, gaId };
   }
 }
 
@@ -48,10 +51,21 @@ export const shouldRevalidate: ShouldRevalidateFunction = () => false;
 export function Layout({ children }: { children: React.ReactNode }) {
   const site = useRouteLoaderData<typeof loader>("root");
   const [documentRelease] = useState(site?.release ?? null);
+  const gaId = site ? site.gaId : (SITE.googleAnalyticsId ?? null);
   return (
     <html lang={SITE.locale} suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
+        {gaId && (
+          <>
+            <script async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} />
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `window.dataLayer = window.dataLayer || [];\nfunction gtag(){dataLayer.push(arguments);}\ngtag('js', new Date());\ngtag('config', '${gaId}');`,
+              }}
+            />
+          </>
+        )}
         {documentRelease && <meta name="hotmoto-release" content={documentRelease} />}
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ece8f5" />
