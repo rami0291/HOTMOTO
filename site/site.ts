@@ -72,7 +72,7 @@ export const SITE = {
   /** 既定のドメイン。SITE_URL が設定されていないときだけ使う。 */
   defaultUrl: "http://localhost:3000",
   /** Google Analytics 測定 ID（G-XXXXXXXXXX、任意）。設定すると全公開ページで gtag.js を読み込む。 */
-  googleAnalyticsId: "G-92MVY4038X" as string | null,
+  googleAnalyticsId: "G-Y3PMXZS2B7" as string | null,
   /** 標準アイコン（favicon.ico、icon.png、icon-192.png、apple-icon.png、logo.svg）以外にサイトのルートに置くアイコン。site/brand/ のファイル名（任意）。manifest.webmanifest や外部サイトが参照するときに使う。 */
   rootIcons: [] as string[],
   /**

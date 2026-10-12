@@ -53,8 +53,8 @@ test("Google Analytics tag is included in document head", async () => {
   const response = await fetch(`${origin}/about`);
   assert.equal(response.status, 200);
   const html = await response.text();
-  assert.match(html, /<script[^>]+src="https:\/\/www\.googletagmanager\.com\/gtag\/js\?id=G-92MVY4038X"[^>]*>/);
-  assert.match(html, /gtag\('config',\s*'G-92MVY4038X'\)/);
+  assert.match(html, /<script[^>]+src="https:\/\/www\.googletagmanager\.com\/gtag\/js\?id=G-Y3PMXZS2B7"[^>]*>/);
+  assert.match(html, /gtag\('config',\s*'G-Y3PMXZS2B7'\)/);
 });
 
 test("SEO and GEO tags are included in document head", async () => {
