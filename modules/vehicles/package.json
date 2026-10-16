@@ -1,0 +1,13 @@
+{
+  "name": "@hotmoto/vehicles",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./server": "./server.ts"
+  },
+  "dependencies": {
+    "@hotmoto/backend": "*",
+    "@hotmoto/industry": "*",
+    "zod": "4.6.5"
+  }
+}

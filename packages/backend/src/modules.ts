@@ -21,6 +21,23 @@ export interface Scheduled {
   when?: () => boolean;
 }
 
+/**
+ * A field of its own in the structure step's answer (editorial/analyze.ts structureRequest). `instructions` follow
+ * the step's system prompt and say what to write under `key`; what `hint` says about the article's own texts (its
+ * title and body, or its post and quote, as the model reads them) follows the material. `schema` reads the answer
+ * under `key` and accepts a missing or broken value (.catch), so the field never fails the step. `ground` keeps
+ * what those texts back, and the analysis stores it under `fields.<key>` of its output. `version` joins the
+ * step's prompt version.
+ */
+export interface StructureField<T = unknown> {
+  key: string;
+  version: string;
+  instructions: string;
+  hint(texts: readonly string[]): string;
+  schema: z.ZodType<T>;
+  ground(answer: T, texts: readonly string[]): unknown;
+}
+
 /** A model step (editorial/models.ts); its default model comes from site/models.ts, else `default`. */
 export interface ModelStep {
   label: string;
@@ -202,6 +219,8 @@ export interface ServerModule {
     runs?: () => Promise<unknown>;
   };
   models?: Record<string, ModelStep>;
+  /** Fields of its own in the structure step's answer (StructureField). */
+  structure?: StructureField[];
   /** Cron schedules (the worker). */
   schedules?: Scheduled[];
   /** What is wrong now, for the owner's alerts (operations/alerts.ts), after the engine's problems. */

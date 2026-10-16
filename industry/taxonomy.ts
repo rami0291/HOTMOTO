@@ -101,6 +101,8 @@ export const ENTITIES: Record<string, { name: string; displayTag: string | null;
   tvs: { name: "TVSモーター", displayTag: null, aliases: ["TVS Motor", "TVS"], otherNames: ["Norton Motorcycles", "ノートン"] },
   cfmoto: { name: "CFMOTO", displayTag: null, aliases: ["CFMOTO", "CFモト", "春風動力"] },
   qjmotor: { name: "QJMOTOR", displayTag: null, aliases: ["QJMOTOR", "QJモーター", "銭江摩托", "钱江摩托"], otherNames: ["Qianjiang Motorcycle", "浙江銭江摩托"] },
+  zxmoto: { name: "ZXMOTO（張雪機車）", displayTag: null, aliases: ["ZXMOTO", "張雪機車", "张雪机车"] },
+  voge: { name: "VOGE", displayTag: null, aliases: ["VOGE", "無極", "无极"], otherNames: ["Loncin", "隆鑫"] },
   yadea: { name: "Yadea", displayTag: null, aliases: ["Yadea", "ヤディア", "雅迪"] },
   gogoro: { name: "Gogoro", displayTag: null, aliases: ["Gogoro", "ゴゴロ"] },
   gachaco: { name: "Gachaco", displayTag: null, aliases: ["Gachaco", "ガチャコ"] },

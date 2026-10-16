@@ -3,7 +3,8 @@
 //   1. prefilter: does the material belong to this industry at all (wide recall). Only BLOCK stops an
 //      item; UNKNOWN goes on like PASS (a BLOCK given while material is missing counts as UNKNOWN);
 //   2. score: two independent scores against the source tier's threshold (industry/selection.ts) decide selection;
-//   3. structure: category, tags, subjects and the current news fact, beside scoring;
+//   3. structure: category, tags, subjects and the current news fact, beside scoring, and the fields the site's
+//      modules add (StructureField);
 //   4. writing, once the structure is in: the title, summary and reason in the site's language by the content
 //      understanding for selected and near-selected items, by the cheaper title/summary prompts for the rest.
 // Material with only a title or a feed summary has its article page fetched before it is judged.
@@ -29,6 +30,7 @@ import {
 } from "./writing.ts";
 import { CATEGORY_GUIDE, CATEGORY_TAGS, ENTITIES, ENTITY_TAGS, ITEM_TYPES, normalizeTags, TOPIC_TAGS } from "./vocabulary.ts";
 import { promptText, promptVersion } from "./prompts.ts";
+import { serverModules } from "../modules.ts";
 
 export { buildMaterial, loadAnalyzeInput, type AnalyzeInputArticle };
 
@@ -187,6 +189,32 @@ export function normalizeStructure(data: z.infer<typeof StructureSchema>, a: Ana
   };
 }
 
+/** The article's own texts as the structure model reads them: the title and the body, or the post and its quote. */
+export function structureTexts(a: AnalyzeInputArticle): string[] {
+  const texts = a.xPost ? [String(a.xPost.text ?? a.title), String(a.xPost.quoted?.text ?? "")] : [a.title, a.bodyText ?? a.excerpt ?? ""];
+  return texts.map((text) => text.slice(0, MAX_BODY_CHARS)).filter((text) => text.trim());
+}
+
+/** The structure request: the pack's prompt and material, with the installed modules' fields (StructureField) after them. */
+export function structureRequest(a: AnalyzeInputArticle) {
+  const fields = serverModules().flatMap((m) => m.structure ?? []);
+  for (const f of fields) if (f.key in StructureSchema.shape) throw new Error(`structure field ${f.key} would replace the step's own`);
+  const texts = structureTexts(a);
+  return {
+    texts,
+    fields,
+    system: [STRUCTURE_SYSTEM, ...fields.map((f) => f.instructions)].join("\n\n"),
+    user: [buildMaterial(a), ...fields.map((f) => f.hint(texts))].join("\n\n"),
+    schema: fields.length ? StructureSchema.and(z.object(Object.fromEntries(fields.map((f) => [f.key, f.schema])))) : StructureSchema,
+    promptVersion: [PROMPT_VERSIONS.structure, ...fields.map((f) => f.version)].join("+"),
+  };
+}
+
+/** Each field's answer, kept as far as the article's own texts back it. */
+export function groundFields(req: ReturnType<typeof structureRequest>, answer: Record<string, unknown>): Record<string, unknown> {
+  return Object.fromEntries(req.fields.map((f) => [f.key, f.ground(answer[f.key], req.texts)]));
+}
+
 export interface AnalysisRun {
   prefilter: { label: "PASS" | "BLOCK" | "UNKNOWN"; reason: string; model: string; receiptId: number; reused: boolean };
   /**
@@ -207,7 +235,7 @@ export interface AnalysisRun {
     receiptIds: number[];
     reused: boolean;
   } | null;
-  structure: (ReturnType<typeof normalizeStructure> & { model: string; receiptId: number; reused: boolean }) | null;
+  structure: (ReturnType<typeof normalizeStructure> & { fields: Record<string, unknown>; model: string; receiptId: number; reused: boolean }) | null;
 }
 
 const isContentFilter = (error: unknown) => error instanceof ProviderRejectedError && !error.retryable && /contentFilter|"1301"/.test(error.message);
@@ -325,19 +353,20 @@ export async function runSelectionScores(
 export async function runStructure(a: AnalyzeInputArticle, opts: StepOpts = {}): Promise<NonNullable<AnalysisRun["structure"]>> {
   const model = await modelFor("structure");
   checkAnalysisRunning();
+  const req = structureRequest(a);
   const res = await chatJson({
     model,
     purpose: "structure_article",
     subject: subjectOf(a),
-    promptVersion: PROMPT_VERSIONS.structure,
-    system: STRUCTURE_SYSTEM,
-    user: buildMaterial(a),
-    schema: StructureSchema,
+    promptVersion: req.promptVersion,
+    system: req.system,
+    user: req.user,
+    schema: req.schema,
     temperature: 0.2,
     maxTokens: 1200,
     attemptTag: tagged(opts.attemptTag, "structure"),
   });
-  return { ...normalizeStructure(res.data, a), model: res.model, receiptId: res.receiptId, reused: res.reused };
+  return { ...normalizeStructure(res.data, a), fields: groundFields(req, res.data), model: res.model, receiptId: res.receiptId, reused: res.reused };
 }
 
 /** Content understanding grounded in the original; null on a content-filter refusal. */
@@ -506,6 +535,7 @@ export async function analyzeArticle(articleId: string, opts: StepOpts = {}): Pr
     ...(w ? { writer: w.kind, writerModel: w.model, itemType: w.itemType ?? null, authorRole: w.authorRole ?? null } : {}),
     ...(w?.identityGuard?.outcome === "fallback" ? { identityGuard: w.identityGuard } : {}),
     scope: out.scope, fact: out.fact,
+    ...(run.structure && Object.keys(run.structure.fields).length ? { fields: run.structure.fields } : {}),
   };
   const committed = await sql.begin(async (tx) => {
     const [current] = await tx<{ revision: number }[]>`SELECT revision FROM articles WHERE id = ${articleId} FOR UPDATE`;

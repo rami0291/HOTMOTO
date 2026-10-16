@@ -79,6 +79,7 @@ flowchart LR
 | `web.tsx` | ウェブへの差し込み口：ページ、ナビゲーション、トピックページと管理画面の部品など（`apps/web/app/modules.ts`）。特定のページにだけ出る部品は読み込み関数を渡し、そのページのコードと一緒に読み込む |
 | `migrations/` | 自分のテーブル。`database/migrations/` と一緒にファイル名順で実行 |
 | `tests/` | 自分のテスト。`npm test` で一緒に動く |
+| `scripts/` | 手で動かす道具（例：`modules/vehicles/scripts/unlisted.ts`）。本番のコードからは読まない |
 
 書き終えたら `site/modules/` の 3 つの一覧に載せます：`index.ts` にアドレス、`server.ts` にバックエンド、`web.ts` にウェブ（ないものは載せない）。さらに `site/package.json` の `dependencies` に書きます。Docker でデプロイするなら、`Dockerfile` にほかのパッケージにならって `COPY modules/<名前>/package.json modules/<名前>/` を 1 行加えます。フレームワークのコードはどのモジュールも import せず、この 3 つの一覧だけを読むので、元のリポジトリの更新を取り込むときも自分の機能と衝突しにくくなっています。差し込み口が足りないときは、その機能をフレームワークに書くのではなく、汎用の差し込み口をフレームワークに加えます。
 
