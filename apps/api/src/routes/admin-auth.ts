@@ -7,8 +7,13 @@ import { config } from "@hotmoto/backend/config";
 import {
   completeLogin,
   cookie,
+  DEVICE_COOKIE,
+  DEVICE_COOKIE_PATH,
+  DEVICE_DAYS,
+  deviceToken,
   endSession,
   feishuLoginConfigured,
+  knownDevice,
   LoginRejected,
   loginRedirect,
   parseCookies,
@@ -20,28 +25,14 @@ import {
   STATE_COOKIE,
   type AdminPrincipal,
 } from "@hotmoto/backend/admin/auth";
+import { LoginThrottle } from "../http/login-throttle.ts";
 import { sendProblem } from "../http/respond.ts";
 
 /** Cookies are Secure whenever the site is served over HTTPS. */
 const secure = () => config.siteUrl.startsWith("https://");
 
-/**
- * Password attempts: at most 10 per client address and 50 in all per 15 minutes. The overall cap holds
- * even when a client forges its address; with a 12+ character password that is far too slow to guess.
- */
-const attempts = new Map<string, number[]>();
-function over(key: string, limit: number, now: number): boolean {
-  const recent = (attempts.get(key) ?? []).filter((t) => now - t < 15 * 60_000);
-  recent.push(now);
-  attempts.set(key, recent);
-  return recent.length > limit;
-}
-function tooManyAttempts(ip: string): boolean {
-  const now = Date.now();
-  if (attempts.size > 5000) attempts.clear();
-  const perClient = over(`ip:${ip}`, 10, now);
-  return over("all", 50, now) || perClient;
-}
+/** Wrong passwords per known browser, per network and in all (http/login-throttle.ts). */
+const throttle = new LoginThrottle();
 
 const loginPage = (returnTo: string, error?: string) => `/admin/login?${new URLSearchParams({ return: safeReturn(returnTo), ...(error ? { error } : {}) })}`;
 
@@ -103,15 +94,23 @@ export function registerAdminAuth(app: FastifyInstance) {
     form.post("/api/auth/password", async (req, reply) => {
       const b = (req.body ?? {}) as Record<string, string>;
       const returnTo = String(b.return ?? "/admin");
+      const ip = String(req.ip);
+      const device = knownDevice(req.headers.cookie);
       reply.header("Cache-Control", "no-store");
-      if (tooManyAttempts(String(req.ip))) return reply.redirect(loginPage(returnTo, "too-many"), 303);
+      if (throttle.blocked(ip, device)) return reply.redirect(loginPage(returnTo, "too-many"), 303);
       try {
         const { token, returnTo: target } = await passwordLogin(String(b.password ?? ""), returnTo, req.headers["user-agent"]);
-        reply.header("Set-Cookie", cookie(SESSION_COOKIE, token, SESSION_DAYS * 86400, secure()));
+        // The browser is known from now on (or for another year): see http/login-throttle.ts.
+        reply.header("Set-Cookie", [
+          cookie(SESSION_COOKIE, token, SESSION_DAYS * 86400, secure()),
+          cookie(DEVICE_COOKIE, deviceToken(device ?? undefined), DEVICE_DAYS * 86400, secure(), DEVICE_COOKIE_PATH),
+        ]);
         return reply.redirect(target, 303);
       } catch (error) {
         if (!(error instanceof LoginRejected)) req.log.error({ err: error }, "admin login failed");
-        return reply.redirect(loginPage(returnTo, error instanceof LoginRejected && /ADMIN_PASSWORD/.test(error.message) ? "unset" : "wrong"), 303);
+        const unset = error instanceof LoginRejected && /ADMIN_PASSWORD/.test(error.message);
+        if (error instanceof LoginRejected && !unset) throttle.fail(ip, device);
+        return reply.redirect(loginPage(returnTo, unset ? "unset" : "wrong"), 303);
       }
     });
   });

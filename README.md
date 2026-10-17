@@ -35,7 +35,7 @@ docker compose up -d --build
 
 <http://localhost:3000> を開きます。管理画面は `/admin` で、管理者パスワードは `.env` の `ADMIN_PASSWORD` にあります。収集は 1〜2 分で始まります。
 
-- **Agent で処理する**：Claude Code などの Agent を定期的に実行し、作業のインターフェース（`/api/agent/tasks`）からタスクを取って答えさせます。プロンプトと cron の例は [Agent による処理](docs/agent.md) にあります。新しい記事は Agent の次の実行（既定は 1 時間ごと）で判断されます。
+- **Agent で処理する**：実行スクリプト `scripts/agent-runner.ts` を定期的に動かし、作業のインターフェース（`/api/agent/tasks`）から取ったタスクに、ツールを持たない Claude Code で 1 件ずつ答えさせます。設定と cron の例は [Agent による処理](docs/agent.md) にあります。新しい記事は Agent の次の実行（既定は 1 時間ごと）で判断されます。
 - **API で処理する**：管理画面の「モデル」ページの「処理方式」で API を選ぶか、`.env` に `PROCESSING_MODE=api` を書きます。初回に取り込む資料はおよそ 30 分で処理が終わります。
 
 Node.js での直接起動、ドメインと HTTPS の設定は [デプロイ](docs/deploy.md) を参照してください。

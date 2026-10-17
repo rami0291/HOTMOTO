@@ -10,6 +10,10 @@ import { sha256 } from "../lib/ids.ts";
 export const SESSION_COOKIE = "hotmoto_admin";
 export const STATE_COOKIE = "hotmoto_oauth_state";
 export const SESSION_DAYS = 30;
+/** A browser that has signed in with the password before; sent only to the sign-in routes. */
+export const DEVICE_COOKIE = "hotmoto_admin_device";
+export const DEVICE_COOKIE_PATH = "/api/auth";
+export const DEVICE_DAYS = 365;
 /** Register this callback in the Feishu open platform when Feishu sign-in is used. */
 export const CALLBACK_URL = `${config.siteUrl}/api/auth/callback`;
 
@@ -100,8 +104,22 @@ export function parseCookies(header: string | undefined): Record<string, string>
   return out;
 }
 
-export function cookie(name: string, value: string, maxAgeSeconds: number, secure: boolean): string {
-  return `${name}=${encodeURIComponent(value)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAgeSeconds}${secure ? "; Secure" : ""}`;
+export function cookie(name: string, value: string, maxAgeSeconds: number, secure: boolean, cookiePath = "/"): string {
+  return `${name}=${encodeURIComponent(value)}; Path=${cookiePath}; HttpOnly; SameSite=Lax; Max-Age=${maxAgeSeconds}${secure ? "; Secure" : ""}`;
+}
+
+const DEVICE_PREFIX = "device:";
+
+/** DEVICE_COOKIE's value for a browser id (a new one by default), signed so that only this site can issue it. */
+export function deviceToken(id = randomBytes(16).toString("base64url")): string {
+  return sign(`${DEVICE_PREFIX}${id}`);
+}
+
+/** The browser id in a valid DEVICE_COOKIE, else null; another signed value (the sign-in state) is not one. */
+export function knownDevice(cookieHeader: string | undefined): string | null {
+  if (!credential("auth", "SESSION_SECRET")) return null;
+  const value = unsign(parseCookies(cookieHeader)[DEVICE_COOKIE]);
+  return value?.startsWith(DEVICE_PREFIX) ? value.slice(DEVICE_PREFIX.length) || null : null;
 }
 
 /** Where to send the browser to sign in; the signed state also carries where to return. */

@@ -10,7 +10,7 @@ import { buttonClass } from "../components/ui/Controls";
 const ERRORS: Record<string, string> = {
   wrong: "パスワードが違います。もう一度お試しください。",
   unset: "管理者パスワードがまだ設定されていません：.env で ADMIN_PASSWORD（12 文字以上）を設定し、再起動してからログインしてください。",
-  "too-many": "試行回数が多すぎます。15 分後にもう一度お試しください。",
+  "too-many": "パスワードの誤りが多すぎます。15 分ほど待ってからもう一度お試しください。前にログインしたことのあるブラウザからは、いまもログインできます。",
 };
 
 export async function loader({ request }: Route.LoaderArgs) {

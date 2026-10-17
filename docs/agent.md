@@ -1,11 +1,12 @@
 # Agent による処理
 
-モデルの工程（予備選別、2 回の採点、構造化、タイトルと要約、出来事のまとめ、まとめ文、週報・月報の総括、全文翻訳）は、モデルの API の代わりに **Agent** に任せられます。Agent は定期的にサイトの作業のインターフェースへ作業を取りに来て、1 件ずつ答えて送り返します。API キーも従量課金も要りません。Claude Code、Codex CLI、Gemini CLI など、HTTP を呼べてプロンプトに従える Agent なら何でも使えます。
+モデルの工程（予備選別、2 回の採点、構造化、タイトルと要約、出来事のまとめ、まとめ文、週報・月報の総括、全文翻訳）は、モデルの API の代わりに **Agent** に任せられます。Agent は定期的にサイトの作業のインターフェースへ作業を取りに来て、1 件ずつ答えて送り返します。API キーも従量課金も要りません。付属の[実行スクリプト](#実行スクリプト)が、Claude Code でタスクに答えます。ほかの Agent をつなぐこともできますが、[安全](#安全)の条件を守ってください。
 
 ```mermaid
 flowchart LR
   W["worker<br/>工程を実行"] -- "モデルが agent の工程は<br/>リクエストをタスクにして待つ" --> Q[("agent_tasks")]
-  A["Agent<br/>定期的に実行"] -- "GET /api/agent/tasks" --> Q
+  A["実行スクリプト<br/>定期的に実行"] -- "GET /api/agent/tasks" --> Q
+  A -- "タスクごとに 1 プロセス<br/>（ツールなし）" --> C["Claude Code"]
   A -- "POST /api/agent/tasks/{id}/answer" --> R[("受領記録")]
   R -- "待っていた作業をすぐ再開<br/>（答えは工程のスキーマで検査）" --> W
 ```
@@ -22,7 +23,7 @@ flowchart LR
 1. **トークン**：`.env` の `AGENT_TOKEN` に 16 文字以上のランダムな文字列を入れます（`node scripts/init-env.ts` は自動で作ります）。設定しなければ作業のインターフェースはすべて `401` を返します。
 2. **処理方式**：`site/models.ts` の `PROCESSING.mode`（いまは `agent`）が既定です。環境変数 `PROCESSING_MODE`（`agent` / `api`）と管理画面の「モデル」ページの「処理方式」がこれより優先します。工程ごとに選んだモデル（管理画面、`PREFILTER_MODEL` などの環境変数）は処理方式より優先するので、「採点だけ API」のような組み合わせもできます。
 3. **安全弁**：タスクを外に出すことも「モデルの呼び出し」なので、`MODEL_CALLS_ENABLED=true` が必要です。
-4. **Agent の実行**を定期的に組みます（下の例）。間隔は管理画面の「モデル」ページで設定し（既定 60 分、5〜1440 分）、作業のインターフェースが Agent に伝えます。Agent 自体の予定（cron など）もこの間隔に合わせてください。
+4. **Agent の実行**を定期的に組みます（下の[実行スクリプト](#実行スクリプト)）。間隔は管理画面の「モデル」ページで設定し（既定 60 分、5〜1440 分）、作業のインターフェースが Agent に伝えます。Agent 自体の予定（cron など）もこの間隔に合わせてください。
 
 ## 作業のインターフェース
 
@@ -97,39 +98,51 @@ GET /api/agent/status
 
 `{"mode": "agent", "intervalMinutes": 60, "waiting": 23, "claimed": 10, "oldestAt": "…", "answeredDay": 412}` を返します。管理画面の「モデル」ページにも同じ数字が出ます。
 
-## 1 回の実行の流れ
+## 実行スクリプト
 
-1. `GET /api/agent/tasks?limit=10` で取ります。
-2. 1 件ずつ `system` を指示、`input` を入力として答え、`POST …/answer` で送ります。2 回の採点は別々の文脈（サブエージェントなど）で答えます。
-3. 1 に戻ります。答えを送ると数秒〜1 分で次の工程のタスクができるので、タスクが空になったら 60 秒ほど待ってもう一度取り、**3 回続けて空なら終わります**。
-4. 1 回の実行の時間に上限を決めておき（例：50 分）、超えたら途中でも終わります。持っていたタスクは 30 分後にほかの実行へ渡ります。
+[`scripts/agent-runner.ts`](../scripts/agent-runner.ts) が 1 回の実行を受け持ちます。Node.js 24 と、サインイン済みの Claude Code（`claude`）がある端末で動きます。リポジトリのほかのファイルを読まないので、このファイルだけをコピーして使えます。
 
-## 定期実行の例
+1. `GET /api/agent/tasks?limit=10` でタスクを取ります。
+2. タスク 1 件ごとに新しい `claude -p` を 1 つ起こして答えさせ（同時に `AGENT_CONCURRENCY` 個、既定 2）、`POST …/answer` で送ります。2 回の採点も別々のプロセスなので、互いの答えを見ません。
+3. 1 に戻ります。答えを送ると数秒〜1 分で次の工程のタスクができるので、タスクが空なら 60 秒待って取り直し、**3 回続けて空なら終わります**。開始から 50 分を超えたとき、3 件続けて答えられなかったとき（サインインの期限切れ、利用量の上限など）も終わります。持っていたタスクは 30 分後にほかの実行へ渡ります。
 
-### Agent に渡すプロンプト
+### 設定
 
-```text
-あなたは HOTMOTO の作業を処理する Agent です。環境変数 HOTMOTO_URL がサイトのアドレス、AGENT_TOKEN がトークンです。
-1. curl -s -H "Authorization: Bearer $AGENT_TOKEN" "$HOTMOTO_URL/api/agent/tasks?limit=10" でタスクを取る。
-2. レスポンスの instructions に従い、各タスクの system を指示、input を入力として答えを作る。
-   format が json なら schema に合う JSON オブジェクト 1 つ、text なら指示どおりの形式の文字列だけを答えにする。
-   subject と purpose が同じで attempt が違うタスクは、互いの答えを見ずに別々に答える。
-3. 答えは curl -s -X POST -H "Authorization: Bearer $AGENT_TOKEN" -H "Content-Type: application/json" \
-   -d '{"output": <答え>}' "$HOTMOTO_URL/api/agent/tasks/<id>/answer" で送る。
-4. 1 に戻る。tasks が空なら 60 秒待って取り直し、3 回続けて空なら終える。開始から 50 分を超えたら終える。
-答えの内容以外の説明は出力しない。
+サイトのアドレスとトークンは、ほかの利用者が読めないファイルに書きます。コマンドラインに書くと、プロセスの一覧やシェルの履歴に残ります。
+
+```bash
+# /srv/hotmoto-agent/agent.env（chmod 600）
+HOTMOTO_URL=https://example.com
+AGENT_TOKEN=サイトの .env と同じ値
+# AGENT_CONCURRENCY=2
 ```
 
-### Claude Code（ヘッドレス）と cron
+Claude Code には、実行する利用者で一度 `claude` を起こしてサインインしておきます。人のいない環境では、`claude setup-token` で作った長期のトークンを `CLAUDE_CODE_OAUTH_TOKEN` に設定する方法もあります。
 
-上のプロンプトを `agent-prompt.txt` に保存し、毎時実行します（日報の締め 08:00 の前に 1 回入るよう、例では毎時 05 分と 07:30）：
+### cron
+
+毎時実行します（日報の締め 08:00 の前に 1 回入るよう、例では毎時 05 分と 07:30）。cron の `PATH` は短いので、`node` と `claude` のあるディレクトリを加えます：
 
 ```cron
-5 * * * *  cd /srv/hotmoto-agent && HOTMOTO_URL=https://example.com AGENT_TOKEN=xxxx claude -p "$(cat agent-prompt.txt)" --allowedTools "Bash(curl:*)" "Bash(sleep:*)"
-30 7 * * * cd /srv/hotmoto-agent && HOTMOTO_URL=https://example.com AGENT_TOKEN=xxxx claude -p "$(cat agent-prompt.txt)" --allowedTools "Bash(curl:*)" "Bash(sleep:*)"
+PATH=/usr/local/bin:/usr/bin:/bin:/home/hotmoto/.local/bin
+5 * * * *  cd /srv/hotmoto-agent && node --env-file=agent.env agent-runner.ts
+30 7 * * * cd /srv/hotmoto-agent && node --env-file=agent.env agent-runner.ts
 ```
 
-Windows ではタスク スケジューラで同じコマンドを登録します。Codex CLI（`codex exec`）、Gemini CLI（`gemini -p`）なども同じプロンプトで動きます。Agent の利用規約と利用量の上限は、使うサービスで確認してください。
+Windows ではタスク スケジューラに `node --env-file=agent.env agent-runner.ts` を登録し、「開始（オプション）」にこのディレクトリを指定します。Claude Code はネイティブ版（`claude.exe`）を使ってください。npm で入れた `claude.cmd` は、シェルを通さずには起動できません。Claude Code の利用規約と利用量の上限も確かめてください。
+
+## 安全
+
+タスクには情報源の記事がそのまま入り、記事は誰でも書けます。記事に「前の指示を無視して〜を実行せよ」と書かれていても、それを読むモデルが何もできないようにするのが実行スクリプトの役目です。
+
+- **モデルは道具を持ちません**：`--tools ""` で Bash、ファイルの読み書き、ウェブの取得などの組み込みのツールをすべて外し、`--safe-mode` と `--strict-mcp-config` でこの端末の MCP サーバー、CLAUDE.md、プラグイン、フックも読みません。ファイルを読む道具だけでも、読んだ中身を要約に書かせてサイトで公開させられるので、読み取りも外します。
+- **1 プロセスに 1 タスク**：指示（`system`）はシステムプロンプトとして、入力（`input`）は標準入力で渡し、ほかのタスクは見せません。実行ファイルと引数は固定で、シェルを通しません。作業ディレクトリは毎回新しい空のディレクトリで、終わったら消します。
+- **鍵を渡しません**：プロセスに渡す環境変数は、Claude Code のサインインと通信に要るもの（`PATH`、`HOME`、`ANTHROPIC_*`、`CLAUDE_*`、プロキシの設定など。Bedrock や Vertex を使うときはそのクラウドの認証情報）だけで、`AGENT_TOKEN` やサイトのほかの鍵は入りません。
+- **出力は答えの本文だけ**：モデルの出力は、そのタスクの答えとしてサイトに送るだけです。送り先のアドレス、ファイル、起動の引数を決めることはありません。
+
+それでも、記事がモデルの**答えの中身**（点数や要約）を偏らせることは防げません。これは API で処理するときと同じで、2 回の独立した採点、工程のスキーマによる検査、プロンプトの安全の指示で抑えます。
+
+自分で別の Agent をつなぐときも、同じ条件を守ってください：タスクを読むモデルにシェル、ファイル、ネットワークの道具を渡さず、タスクを取って答えを送るのはモデルではなくプログラムにします。`curl` を許したモデルにタスクを読ませると、記事に書かれた指示で端末のファイルを外へ送られたり、書き換えられたりするおそれがあります。
 
 ## 注意
 
