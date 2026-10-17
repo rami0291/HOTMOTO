@@ -6,7 +6,8 @@
 //   CBR250RR, MC49 not inside MC490); a name ending in a digit may be followed by the unit cc (レブル250cc).
 // - Where names overlap, the longest wins (Rebel 1100 over the series Rebel); on a tie, a dictionary model.
 // - A type code names every model that shares it (siblings on one frame).
-// - A series name followed by a number names a model the dictionary lacks (Rebel 300), not the series.
+// - A series name followed by a number names a model the dictionary lacks (Rebel 300), not the series; a number
+//   that counts something (レブル 2026年モデル, NMAX 2台, PCX 35万円) is not a model number, and the series stays.
 import { aliasKey, NAME_SEPARATORS, VEHICLE_FAMILIES, VEHICLES } from "@hotmoto/industry/vehicles";
 
 export interface VehicleMatch {
@@ -23,8 +24,10 @@ type Target = { kind: "models"; slugs: string[] } | { kind: "family"; id: string
 const SEP = `[${NAME_SEPARATORS}]*`;
 const EDGE = /[a-z0-9]/i;
 const escape = (c: string) => c.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-/** The number after a series name, without a trailing cc. */
-const NUMBER_AFTER = new RegExp(`^${SEP}\\d+(?:(?!cc(?![a-z0-9]))[a-z0-9])*`, "i");
+/** What a number counts when it comes right before one of these: a year, a count, a price, a share, a rank. */
+const COUNTERS = "年台辆万円元%人名件款色位月";
+/** The number after a series name, without a trailing cc; not one that counts something. */
+const NUMBER_AFTER = new RegExp(`^${SEP}\\d+(?:(?!cc(?![a-z0-9]))[a-z0-9])*(?=cc(?![a-z0-9])|[^a-z0-9${COUNTERS}]|$)`, "i");
 
 function pattern(name: string, family = false): RegExp {
   const chars = [...aliasKey(name)];

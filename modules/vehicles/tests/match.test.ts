@@ -4,7 +4,8 @@
 // - a name in Chinese, full-width or with a unit after it is missed;
 // - a name is found inside a longer model name or code (CB250R in CBR250RR, MC49 in MC490);
 // - a series name with a number after it counts as the series, though it names a model the dictionary lacks;
-//   or the series is reported where a longer model name covers it;
+//   or the series is reported where a longer model name covers it; or a year, a count or a price after the series
+//   is taken for a model number, and the series is lost;
 // - one name is reported again for each spelling.
 import assert from "node:assert/strict";
 import { test } from "node:test";
@@ -51,6 +52,13 @@ test("a series alone is the series; with a number after it, a model the dictiona
   assert.deepEqual(match("レブル300 の海外仕様"), { models: [], families: [], unlisted: ["レブル300"] });
   assert.deepEqual(match("Svartpilen 200 が欧州で登場"), { models: [], families: [], unlisted: ["Svartpilen 200"] });
   assert.deepEqual(match("レブル300ccとレブル1100"), { models: ["honda-rebel-1100"], families: [], unlisted: ["レブル300"] });
+});
+
+test("a year, a count or a price after a series name is not a model number", () => {
+  assert.deepEqual(match("ホンダ、レブル 2026年モデルを発表"), { models: [], families: ["honda-rebel"], unlisted: [] });
+  assert.deepEqual(match("NMAX 2台をプレゼント"), { models: [], families: ["yamaha-nmax"], unlisted: [] });
+  assert.deepEqual(match("PCX 35万円から、PCX 2026款上市"), { models: [], families: ["honda-pcx"], unlisted: [] });
+  assert.deepEqual(match("Rebel 300X は 2026年発売"), { models: [], families: [], unlisted: ["Rebel 300X"] });
 });
 
 test("every dictionary alias names only its own model, including overlapping series and trims", () => {
