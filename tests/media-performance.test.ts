@@ -9,7 +9,7 @@ import sharp from "sharp";
 import { SITE } from "@hotmoto/site";
 
 const dir = await mkdtemp(path.join(tmpdir(), "hotmoto-media-test-"));
-process.env.hotmoto_DATA_DIR = dir;
+process.env.HOTMOTO_DATA_DIR = dir;
 process.env.ALLOW_PRIVATE_NETWORK_FETCH = "true";
 process.env.MODEL_CALLS_ENABLED = "false";
 const { produceImage } = await import("@hotmoto/backend/media/images");

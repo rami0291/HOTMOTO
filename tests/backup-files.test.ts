@@ -117,7 +117,7 @@ test("a real paired restore opens a feedback screenshot when forwarding is disab
       assert.ok(file && existsSync(file), "restored local feedback screenshot must exist");
       assert.deepEqual(await readFile(file), Buffer.from(process.env.RESTORED_BYTES, "base64"));
     } finally { await closeDb(); }
-  `], { cwd: path.resolve(import.meta.dirname, ".."), env: { ...process.env, DATABASE_URL: restoredUrl.href, hotmoto_DATA_DIR: data, RESTORED_ID: String(id), RESTORED_CONTENT: content, RESTORED_KEY: before!.screenshot_key, RESTORED_BYTES: PNG.toString("base64"), RESTORED_EXTERNAL_ID: String(external!.id), RESTORED_EXTERNAL_KEY: externalKey } });
+  `], { cwd: path.resolve(import.meta.dirname, ".."), env: { ...process.env, DATABASE_URL: restoredUrl.href, HOTMOTO_DATA_DIR: data, RESTORED_ID: String(id), RESTORED_CONTENT: content, RESTORED_KEY: before!.screenshot_key, RESTORED_BYTES: PNG.toString("base64"), RESTORED_EXTERNAL_ID: String(external!.id), RESTORED_EXTERNAL_KEY: externalKey } });
 });
 
 

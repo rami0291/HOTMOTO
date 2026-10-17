@@ -32,8 +32,8 @@ function bool(name: string, fallback: boolean): boolean {
 
 export const isProduction = env.NODE_ENV === "production";
 
-/** hotmoto_CREDENTIALS_DIR, else the site's own default (relative to the repository). */
-const credentialsDir = env.hotmoto_CREDENTIALS_DIR || DEPLOYMENT.credentialsDir;
+/** HOTMOTO_CREDENTIALS_DIR, else the site's own default (relative to the repository). */
+const credentialsDir = env.HOTMOTO_CREDENTIALS_DIR || DEPLOYMENT.credentialsDir;
 
 export const config = {
   databaseUrl: str("DATABASE_URL", "postgres://127.0.0.1:5432/hotmoto"),
@@ -48,9 +48,9 @@ export const config = {
   indexNowKey: /^[0-9a-f]{32}$/.test(env.INDEXNOW_KEY ?? "") ? env.INDEXNOW_KEY! : null,
   /** Optional directory of per-group dotenv files (models.env, collectors.env, …); normally everything is in .env. */
   credentialsDir: credentialsDir ? path.resolve(REPO_ROOT, credentialsDir) : null,
-  dataDir: str("hotmoto_DATA_DIR", path.join(REPO_ROOT, ".data")),
+  dataDir: str("HOTMOTO_DATA_DIR", path.join(REPO_ROOT, ".data")),
   // Name of this deployment in alerts ("production" sends them without a prefix).
-  environmentName: str("hotmoto_ENVIRONMENT", isProduction ? "production" : "development"),
+  environmentName: str("HOTMOTO_ENVIRONMENT", isProduction ? "production" : "development"),
   // External-action valve: off unless the environment turns it on, like COLLECT_ENABLED (read by the
   // worker).
   modelCallsEnabled: bool("MODEL_CALLS_ENABLED", false),
@@ -65,13 +65,13 @@ export type CredentialGroup = "models" | "collectors" | "integrations" | "auth";
 
 const groupCache = new Map<CredentialGroup, Record<string, string>>();
 
-/** The file a group is kept in, under hotmoto_CREDENTIALS_DIR: the site's name for it, else <group>.env. */
+/** The file a group is kept in, under HOTMOTO_CREDENTIALS_DIR: the site's name for it, else <group>.env. */
 function groupFile(group: CredentialGroup): string {
   return DEPLOYMENT.credentialFiles[group] ?? `${group}.env`;
 }
 
 /**
- * Loads one credential group from an optional dotenv file (hotmoto_CREDENTIALS_DIR/<group>.env). Values
+ * Loads one credential group from an optional dotenv file (HOTMOTO_CREDENTIALS_DIR/<group>.env). Values
  * in the environment always win; a normal deployment only uses environment variables (.env).
  */
 export function credentials(group: CredentialGroup): Record<string, string> {

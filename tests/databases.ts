@@ -65,7 +65,7 @@ if (process.env.NODE_TEST_CONTEXT && isMainThread) {
   process.env.DATABASE_URL = urlOf(copy);
   const scratch = mkdtempSync(path.join(tmpdir(), scratchPrefix(process.ppid)));
   for (const dir of ["data", "tmp"]) mkdirSync(path.join(scratch, dir));
-  process.env.hotmoto_DATA_DIR = path.join(scratch, "data");
+  process.env.HOTMOTO_DATA_DIR = path.join(scratch, "data");
   process.env.TMPDIR = path.join(scratch, "tmp"); // os.tmpdir(): whatever the file creates goes with it
   process.on("exit", () => rmSync(scratch, { recursive: true, force: true }));
 }

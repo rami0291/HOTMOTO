@@ -13,7 +13,7 @@ x-backend: &backend
   environment: &backend-env
     NODE_ENV: production
     DATABASE_URL: postgres://hotmoto:${POSTGRES_PASSWORD:-hotmoto}@db:5432/hotmoto
-    hotmoto_DATA_DIR: /data
+    HOTMOTO_DATA_DIR: /data
     API_BASE_URL: http://api:3001
     # No proxy in front limits pushes to /api/ingest/items: the api does (per client and minute; 0 turns it off).
     INGEST_RATE_LIMIT: ${INGEST_RATE_LIMIT:-10}
@@ -75,7 +75,7 @@ services:
       API_BASE_URL: http://api:3001
       SITE_URL: ${SITE_URL:-http://localhost:3000}
       TRUST_PROXY: ${TRUST_PROXY:-false}
-      hotmoto_RELEASE: ${hotmoto_RELEASE:-}
+      HOTMOTO_RELEASE: ${HOTMOTO_RELEASE:-}
       GOOGLE_ANALYTICS_ID: ${GOOGLE_ANALYTICS_ID:-}
       WEB_HOST: 0.0.0.0
       WEB_PORT: "3000"

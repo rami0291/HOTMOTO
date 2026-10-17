@@ -11,7 +11,7 @@ import sharp from "sharp";
 import { CATEGORY_KEYS } from "@hotmoto/contracts/taxonomy";
 
 const directory = await mkdtemp(path.join(os.tmpdir(), "share-image-warm-"));
-process.env.hotmoto_DATA_DIR = directory;
+process.env.HOTMOTO_DATA_DIR = directory;
 const { sql, closeDb } = await import("@hotmoto/backend/db");
 const { stopBoss } = await import("@hotmoto/backend/jobs/queue");
 const { upsertMaterial } = await import("@hotmoto/backend/content/materials");

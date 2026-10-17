@@ -64,7 +64,7 @@ test("API startup is quiet and an unexpected error retains the request, stack an
   `;
   const result = spawnSync(process.execPath, ["--input-type=module", "-e", script], {
     cwd: new URL("..", import.meta.url), encoding: "utf8", timeout: 15000,
-    env: { ...process.env, DATABASE_URL: "postgres://127.0.0.1/hotmoto_logging_test", hotmoto_CREDENTIALS_DIR: "/nonexistent-test-credentials", LOG_LEVEL: "info" },
+    env: { ...process.env, DATABASE_URL: "postgres://127.0.0.1/hotmoto_logging_test", HOTMOTO_CREDENTIALS_DIR: "/nonexistent-test-credentials", LOG_LEVEL: "info" },
   });
   assert.equal(result.status, 0, result.stderr);
   assert.equal(result.stderr, "");

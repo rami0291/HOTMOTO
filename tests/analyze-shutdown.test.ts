@@ -59,7 +59,7 @@ function worker(queue: string) {
     await registerContentJobs(await getBoss());
     process.send({ ready: true });
   `;
-  const env = { ...process.env, TEST_ANALYZE_QUEUE: queue, MODEL_CALLS_ENABLED: "true", hotmoto_CREDENTIALS_DIR: "/nonexistent-test-credentials" };
+  const env = { ...process.env, TEST_ANALYZE_QUEUE: queue, MODEL_CALLS_ENABLED: "true", HOTMOTO_CREDENTIALS_DIR: "/nonexistent-test-credentials" };
   pointModels(provider.url, undefined, env);
   const child = spawn(process.execPath, ["--input-type=module", "-e", script], { cwd: process.cwd(), env, stdio: ["ignore", "pipe", "pipe", "ipc"] });
   children.add(child);

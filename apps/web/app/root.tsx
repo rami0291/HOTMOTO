@@ -32,7 +32,7 @@ export const links: Route.LinksFunction = () => [
 
 /** The release rendering this document: once a newer one is deployed, a render error reloads the page (entry.client). */
 export async function loader({ request }: Route.LoaderArgs) {
-  const release = process.env.hotmoto_RELEASE ?? null;
+  const release = process.env.HOTMOTO_RELEASE ?? null;
   const envGaId = process.env.GOOGLE_ANALYTICS_ID?.trim();
   const gaId = envGaId === "disabled" || envGaId === "off" ? null : (envGaId || SITE.googleAnalyticsId || null);
   try {
