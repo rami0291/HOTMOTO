@@ -106,9 +106,9 @@ test("the audited command is idempotent and cannot decode a literal entity a sec
 test("stale material and unproved text shapes are refused instead of being rewritten", async () => {
   const { id } = await fixture();
   const plan = (await previewXEncodingRepair(id))!;
-  await assert.rejects(normalizeXEncoding(id, { version: plan.version + 1, hash: plan.hash, requestId: `stale-${id}`, reason: 'Stale' }, 'test'), /changed|修改|版本/i);
+  await assert.rejects(normalizeXEncoding(id, { version: plan.version + 1, hash: plan.hash, requestId: `stale-${id}`, reason: 'Stale' }, 'test'), /changed|変更/i);
   await sql`UPDATE articles SET x_post=jsonb_set(x_post,'{text}','"Changed text"'::jsonb) WHERE id=${id}`;
-  await assert.rejects(normalizeXEncoding(id, { version: plan.version, hash: plan.hash, requestId: `stale-${id}`, reason: 'Stale' }, 'test'), /changed|修改|版本/i);
+  await assert.rejects(normalizeXEncoding(id, { version: plan.version, hash: plan.hash, requestId: `stale-${id}`, reason: 'Stale' }, 'test'), /changed|変更/i);
   assert.equal((await sql`SELECT 1 FROM audit_log WHERE subject=${`content:${id}`} AND action='content.normalize-x-encoding'`).length, 0);
   const [row] = await sql`SELECT a.*,s.kind FROM articles a JOIN sources s ON s.id=a.source_id WHERE a.id=${id}`;
   assert.throws(() => xEncodingRepairPlan({ ...row, kind: 'rss' } as never), /X|provider|来源/);

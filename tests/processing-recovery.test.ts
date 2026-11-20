@@ -34,7 +34,7 @@ const provider = await stub(async (_hit, request) => {
   const content = step === "prefilter" ? { label: original ? "BLOCK" : "PASS", reason: "local fixture" }
     : step === "score" ? { attentionScore: SELECTING_SCORE }
     : step === "structure" ? { category: "new-models", tags: [], subjects: [], fact: null }
-    : { itemType: "model_release", authorRole: "principal", tags: ["新型車"], editorialJudgment: "模型能力提升", titleZh: `新判断 ${T}`, summaryZh: "新型車并提供评测和价格。" };
+    : { itemType: "model_release", authorRole: "principal", tags: ["新型車"], editorialJudgment: "性能の向上がはっきりしている", title: `新しい判断 ${T}`, summary: "新型車が発表され、試乗の評価と価格も示された。" };
   return { choices: [{ message: { content: JSON.stringify(content) } }] };
 });
 pointModels(provider.url);

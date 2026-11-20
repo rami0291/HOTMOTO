@@ -28,7 +28,7 @@ const provider = await stub(async (_hit, request) => {
   const content = step === "prefilter" ? { label: "PASS", reason: "AI model release" }
     : step === "score" ? { attentionScore: SELECTING_SCORE }
       : step === "structure" ? { category: "new-models", tags: ["新型車"], subjects: [], fact: { title: "新新型車" } }
-        : { itemType: "model_release", authorRole: "principal", tags: ["新型車"], editorialJudgment: "模型有明确的能力提升", titleZh: `新新型車 ${T}`, summaryZh: "新型車并提供了评测和价格。" };
+        : { itemType: "model_release", authorRole: "principal", tags: ["新型車"], editorialJudgment: "性能の向上がはっきりしている", title: `新しい新型車 ${T}`, summary: "新型車が発表され、試乗の評価と価格も示された。" };
   return { id: `stub-${calls.length}`, choices: [{ message: { content: JSON.stringify(content) } }], usage: { prompt_tokens: 10, completion_tokens: 10, total_tokens: 20 } };
 });
 

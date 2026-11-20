@@ -22,8 +22,8 @@ let response: "complete" | "missing" = "complete";
 const provider = await stub((_hit, request) => {
   const body = JSON.parse(request.body);
   const text = body.messages[1].content as string;
-  if (text.includes("【报道 A】")) return { choices: [{ message: { content: JSON.stringify({ a: "发布", b: "发布", relation: "SAME_OCCURRENCE", difference: "", confidence: 1 }) } }] };
-  const ids = [...text.matchAll(/【候选 (C\d+)】/g)].map(m => m[1]);
+  if (text.includes("【報道 A】")) return { choices: [{ message: { content: JSON.stringify({ a: "発表", b: "発表", relation: "SAME_OCCURRENCE", difference: "", confidence: 1 }) } }] };
+  const ids = [...text.matchAll(/【候補 (C\d+)】/g)].map(m => m[1]);
   return { choices: [{ message: { content: JSON.stringify({ query: "新新型車", decisions: (response === "missing" ? [] : ids).map(id => ({ id, relation: "SAME_OCCURRENCE", confidence: 1, note: "" })), selection: { addsValue: true, reason: "fixture news" } }) } }] };
 });
 for (const name of ["DEEPSEEK", "XIAOMI_MIMO"]) {
