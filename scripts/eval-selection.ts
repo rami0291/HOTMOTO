@@ -136,7 +136,7 @@ for (const model of models) {
     const receiptIds: number[] = [];
     try {
       const prefilter = await runSelectionPrefilter(input, {}, (id) => receiptIds.push(id));
-      if (prefilter.label === "BLOCK") {
+      if (prefilter.label === "BLOCK" || prefilter.label === "ASIDE") {
         const run: AnalysisRun = { prefilter, scores: null, writing: null, structure: null };
         return { r, out: normalizeAnalysis(run), receiptIds, error: null as string | null };
       }

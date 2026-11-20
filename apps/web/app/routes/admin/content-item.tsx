@@ -145,6 +145,7 @@ export default function ContentItem({ loaderData }: Route.ComponentProps) {
                     <div key={an.id} className="rounded-control bg-bg-sunk/60 p-3 ring-1 ring-line">
                       <div className="flex flex-wrap items-center gap-1.5 text-[12px]">
                         <Badge tone={an.relevance === "pass" ? "ok" : "muted"}>{an.relevance}</Badge>
+                        {an.prefilter_label === "ASIDE" && <Badge tone="info">商品欄</Badge>}
                         {an.selected && <Badge tone="accent">入選</Badge>}
                         <Badge tone="info">点数 {an.score}</Badge>
                         {an.category && <Badge>{CATEGORY_LABELS[an.category as keyof typeof CATEGORY_LABELS] ?? an.category}</Badge>}

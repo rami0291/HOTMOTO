@@ -26,6 +26,14 @@ export function isPoolEligible(input: {
 }
 
 /**
+ * Set aside (a module's shelf, never the pool): an editorial item the prefilter labelled ASIDE, still
+ * not relevant as news (an editor who passes it brings it back to the news).
+ */
+export function isAside(input: { participationMode: string; relevance: string | null; prefilterLabel: string | null }): boolean {
+  return input.participationMode === "editorial" && input.relevance === "block" && input.prefilterLabel === "ASIDE";
+}
+
+/**
  * Item detail page (and its Markdown export): every unwithdrawn item from an editorial source has one,
  * with or without a summary in the site's language (noindex unless indexable). hot_signal material is heat evidence
  * only and has none. A paused source keeps its pages.

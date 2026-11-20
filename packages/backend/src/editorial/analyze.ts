@@ -1,7 +1,9 @@
 // analyzeArticle: the judging and writing steps, each with its own prompt from the industry pack
 // (industry/prompts/):
-//   1. prefilter: does the material belong to this industry at all (wide recall). Only BLOCK stops an
-//      item; UNKNOWN goes on like PASS (a BLOCK given while material is missing counts as UNKNOWN);
+//   1. prefilter: does the material belong to this industry at all (wide recall). BLOCK stops an item;
+//      ASIDE stops it too, for material of the industry that is not news (ads, product listings,
+//      timeless reads), which the prefilter titles itself and the publication sets aside for its own
+//      shelf; UNKNOWN goes on like PASS (a BLOCK or ASIDE given while material is missing counts as UNKNOWN);
 //   2. score: two independent scores against the source tier's threshold (industry/selection.ts) decide selection;
 //   3. structure: category, tags, subjects and the current news fact, beside scoring, and the fields the site's
 //      modules add (StructureField);
@@ -110,9 +112,14 @@ export function buildScoreInput(a: AnalyzeInputArticle): string {
 // Step outputs
 
 const PrefilterSchema = z.object({
-  label: z.preprocess((v) => String(v ?? "").trim().toUpperCase(), z.enum(["PASS", "BLOCK", "UNKNOWN"])),
+  label: z.preprocess((v) => String(v ?? "").trim().toUpperCase(), z.enum(["PASS", "BLOCK", "UNKNOWN", "ASIDE"])),
   reason: z.string().max(200).catch(""),
+  /** ASIDE's title in the site's language: an aside item gets no other writing step. */
+  title: z.preprocess((v) => (typeof v === "string" ? collapseWhitespace(v).slice(0, 80) : ""), z.string()),
 });
+
+/** The labels that end the analysis at the prefilter. */
+const STOPS = new Set(["BLOCK", "ASIDE"]);
 
 const FactSchema = z
   .object({
@@ -216,7 +223,8 @@ export function groundFields(req: ReturnType<typeof structureRequest>, answer: R
 }
 
 export interface AnalysisRun {
-  prefilter: { label: "PASS" | "BLOCK" | "UNKNOWN"; reason: string; model: string; receiptId: number; reused: boolean };
+  /** `title`: ASIDE's own title, empty for the other labels. */
+  prefilter: { label: "PASS" | "BLOCK" | "UNKNOWN" | "ASIDE"; reason: string; title: string; model: string; receiptId: number; reused: boolean };
   /**
    * The independent score calls and the tier threshold they are held against; absent when the material
    * is not scored. `refused`: the model's content filter declined it, so it is not selected.
@@ -274,9 +282,10 @@ async function runPrefilter(a: AnalyzeInputArticle, opts: StepOpts): Promise<Ana
     maxTokens: 512,
     attemptTag: opts.attemptTag,
   });
-  // A BLOCK without material to back it counts as UNKNOWN (which goes on).
-  const label = res.data.label === "BLOCK" && missingEvidence(a) ? "UNKNOWN" : res.data.label;
-  return { label, reason: res.data.reason, model: res.model, receiptId: res.receiptId, reused: res.reused };
+  // A BLOCK or ASIDE without material to back it counts as UNKNOWN (which goes on).
+  const label = STOPS.has(res.data.label) && missingEvidence(a) ? "UNKNOWN" : res.data.label;
+  const title = label === "ASIDE" ? res.data.title : "";
+  return { label, reason: res.data.reason, title, model: res.model, receiptId: res.receiptId, reused: res.reused };
 }
 
 /** The production prefilter step, exposed separately so SelectBench can preserve partial receipt evidence. */
@@ -445,8 +454,8 @@ async function runSummarize(a: AnalyzeInputArticle, opts: StepOpts): Promise<Non
 export async function runAnalysis(a: AnalyzeInputArticle, opts: StepOpts = {}): Promise<AnalysisRun> {
   checkAnalysisRunning();
   const prefilter = await runSelectionPrefilter(a, opts);
-  // UNKNOWN is let through (its material is as complete as it will get); BLOCK stops here.
-  if (prefilter.label === "BLOCK") return { prefilter, scores: null, writing: null, structure: null };
+  // UNKNOWN is let through (its material is as complete as it will get); BLOCK and ASIDE stop here.
+  if (STOPS.has(prefilter.label)) return { prefilter, scores: null, writing: null, structure: null };
   // The structure step needs nothing from the scores: it runs beside them.
   const structure = runStructure(a, opts).then((value) => ({ value }), (error: unknown) => ({ error }));
   try {
@@ -467,11 +476,12 @@ export async function runAnalysis(a: AnalyzeInputArticle, opts: StepOpts = {}): 
 /** One judgement from the steps: the selection rule, the reader-facing copy and the structure. */
 export function normalizeAnalysis(run: AnalysisRun) {
   const label = run.prefilter.label;
-  const titleZh = collapseWhitespace(run.writing?.titleZh ?? "");
+  const titleZh = collapseWhitespace(label === "ASIDE" ? run.prefilter.title : run.writing?.titleZh ?? "");
   const summaryZh = (run.writing?.summaryZh ?? "").trim();
   // Past the prefilter (PASS or UNKNOWN) an item is relevant, but without a usable written title and
-  // summary it cannot be published: it waits.
-  const relevance = label === "BLOCK" ? "block" : run.writing && (!titleZh || !summaryZh) ? "unknown" : "pass";
+  // summary it cannot be published: it waits. ASIDE is not news either: no news surface lists it, and
+  // its publication is set aside (publication/rules.ts isAside).
+  const relevance = STOPS.has(label) ? "block" : run.writing && (!titleZh || !summaryZh) ? "unknown" : "pass";
   // Selected when the two scores add up to twice the tier threshold; the mean, floored, is the score
   // shown (it never decides a half point on its own).
   const values = run.scores && !run.scores.refused ? run.scores.values : null;
