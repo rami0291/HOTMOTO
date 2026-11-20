@@ -1,7 +1,8 @@
 // Answers the site's model tasks with Claude Code, for a site whose processing mode is agent (docs/agent.md).
 //   node --env-file=agent.env scripts/agent-runner.ts
 // agent.env: HOTMOTO_URL (the site's address), AGENT_TOKEN (the site's token), and optionally
-// AGENT_CONCURRENCY (Claude Code processes at once, 1–8, default 2).
+// AGENT_CONCURRENCY (Claude Code processes at once, 1–8, default 2) and AGENT_MODELS (the model per
+// step, see STEP_MODELS).
 //
 // A task carries an article, which is untrusted text, so the model that reads it holds no tools at all.
 // This script takes the tasks and posts the answers; each task runs in its own `claude -p` process (a
@@ -71,17 +72,49 @@ export function childEnv(env: NodeJS.ProcessEnv): Record<string, string> {
 }
 
 /**
- * The fixed arguments: no built-in tool, nothing from this machine's configuration, the result as JSON.
- * The step's schema goes in the system prompt, not --json-schema: Claude Code refuses the draft 2020-12
- * schemas the site sends, and the site checks every answer against the step's schema anyway.
+ * The model for each step (the task's purpose). Without one Claude Code uses the machine's default,
+ * often Opus, for every task down to a one-word prefilter label. Short judgments and the plain titles
+ * and translations go to Haiku; scoring, structure, grouping, the content understanding, digests and
+ * reports to Sonnet. The full Haiku name: the alias `haiku` still means an older model.
  */
-export function claudeArgs(systemFile: string): string[] {
+const SMALL = "claude-haiku-5-5";
+const MIDDLE = "claude-sonnet-5-5";
+const STEP_MODELS: Record<string, string> = {
+  prefilter_article: SMALL, summarize_article: SMALL, group_signal: SMALL, translate_body: SMALL, translate_quoted: SMALL,
+};
+/** Every task is one bounded answer; thinking longer adds output, not a better label. */
+const EFFORT = "low";
+
+/** AGENT_MODELS: `purpose=model` entries, comma-separated; `*` is every step without its own entry. */
+export function parseModels(value: string | undefined): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const entry of (value ?? "").split(",").map((s) => s.trim()).filter(Boolean)) {
+    const m = /^([a-z_]+|\*)=([A-Za-z0-9][\w.\-[\]]*)$/.exec(entry);
+    if (!m) throw new Error(`AGENT_MODELS: "${entry}" is not purpose=model`);
+    out[m[1]!] = m[2]!;
+  }
+  return out;
+}
+
+export function modelFor(purpose: string, overrides: Record<string, string> = {}): string {
+  return overrides[purpose] ?? overrides["*"] ?? STEP_MODELS[purpose] ?? MIDDLE;
+}
+
+/**
+ * The fixed arguments: no built-in tool, nothing from this machine's configuration, the result as JSON,
+ * and the step's model. The step's schema goes in the system prompt, not --json-schema: Claude Code
+ * refuses the draft 2020-12 schemas the site sends, and the site checks every answer against the step's
+ * schema anyway.
+ */
+export function claudeArgs(systemFile: string, model: string): string[] {
   return [
     "-p",
     "--tools", "",
     "--safe-mode",
     "--strict-mcp-config",
     "--no-session-persistence",
+    "--model", model,
+    "--effort", EFFORT,
     "--output-format", "json",
     "--system-prompt-file", systemFile,
   ];
@@ -140,12 +173,12 @@ export function answerOf(stdout: string): string {
 }
 
 /** Answers one task in a fresh Claude Code process, in a fresh empty directory that is removed after. */
-export async function askClaude(task: AgentTask, cli: Cli = CLAUDE, timeoutMs = TASK_TIMEOUT_MS): Promise<string> {
+export async function askClaude(task: AgentTask, model: string, cli: Cli = CLAUDE, timeoutMs = TASK_TIMEOUT_MS): Promise<string> {
   const dir = await mkdtemp(path.join(tmpdir(), "hotmoto-agent-"));
   try {
     const systemFile = path.join(dir, "system.md");
     await writeFile(systemFile, systemPrompt(task), { mode: 0o600 });
-    return answerOf(await run(cli, claudeArgs(systemFile), promptInput(task), dir, timeoutMs));
+    return answerOf(await run(cli, claudeArgs(systemFile, model), promptInput(task), dir, timeoutMs));
   } finally {
     await rm(dir, { recursive: true, force: true });
   }
@@ -191,6 +224,33 @@ async function postAnswer(base: URL, token: string, id: number, output: unknown)
   return true;
 }
 
+/** How long a prompt stays in the provider's cache after a call read or wrote it (kept under its five minutes). */
+const CACHE_MS = 4 * 60_000;
+/** Tasks of one step share their system prompt, the part the provider caches across processes. */
+const promptKey = (task: AgentTask) => `${task.purpose}\n${task.system}`;
+
+/**
+ * A take in waves: first every task whose prompt is cached and one task for each prompt that is not,
+ * then the rest. Calls started together all miss the cache and each writes it at full price (the two
+ * scores of an article arrive together), so the others wait until it is written.
+ */
+export function waves(tasks: AgentTask[], cachedAt: Map<string, number>, now = Date.now()): AgentTask[][] {
+  const first: AgentTask[] = [];
+  const rest: AgentTask[] = [];
+  const writing = new Set<string>();
+  for (const task of tasks) {
+    const key = promptKey(task);
+    const cached = now - (cachedAt.get(key) ?? -Infinity) < CACHE_MS;
+    if (cached || !writing.has(key)) {
+      if (!cached) writing.add(key);
+      first.push(task);
+    } else {
+      rest.push(task);
+    }
+  }
+  return [first, rest].filter((wave) => wave.length > 0);
+}
+
 export interface RunOptions {
   base: URL;
   token: string;
@@ -214,6 +274,7 @@ export async function runAgent(o: RunOptions): Promise<{ answered: number; faile
   let inARow = 0;
   let empty = 0;
   let fatal: Error | null = null;
+  const cachedAt = new Map<string, number>();
   const stopping = () => !!fatal || inARow >= FAILURES_IN_A_ROW || Date.now() >= deadline;
   while (!stopping()) {
     const tasks = await takeTasks(o.base, o.token);
@@ -223,12 +284,14 @@ export async function runAgent(o: RunOptions): Promise<{ answered: number; faile
       continue;
     }
     empty = 0;
-    const queue = [...tasks];
+    const queue: AgentTask[] = [];
     const worker = async () => {
       for (let task = queue.shift(); task && !stopping(); task = queue.shift()) {
         const started = Date.now();
         try {
-          const kept = await postAnswer(o.base, o.token, task.id, await o.ask(task));
+          const answer = await o.ask(task);
+          cachedAt.set(promptKey(task), Date.now());
+          const kept = await postAnswer(o.base, o.token, task.id, answer);
           if (kept) answered++;
           inARow = 0;
           log(`${kept ? "✓" : "–"} #${task.id} ${task.purpose} ${((Date.now() - started) / 1000).toFixed(1)}s${kept ? "" : " (no longer waiting)"}`);
@@ -240,7 +303,11 @@ export async function runAgent(o: RunOptions): Promise<{ answered: number; faile
         }
       }
     };
-    await Promise.all(Array.from({ length: Math.min(o.concurrency, tasks.length) }, worker));
+    for (const wave of waves(tasks, cachedAt)) {
+      if (stopping()) break;
+      queue.push(...wave);
+      await Promise.all(Array.from({ length: Math.min(o.concurrency, wave.length) }, worker));
+    }
   }
   if (fatal) throw fatal;
   if (inARow >= FAILURES_IN_A_ROW) log(`${FAILURES_IN_A_ROW} tasks in a row failed: stopping this run`);
@@ -256,7 +323,9 @@ if (import.meta.main) {
     process.exit(1);
   }
   try {
-    const { answered, failed } = await runAgent({ base: new URL(url), token, concurrency, ask: (task) => askClaude(task) });
+    const models = parseModels(process.env.AGENT_MODELS);
+    const ask = (task: AgentTask) => askClaude(task, modelFor(task.purpose, models));
+    const { answered, failed } = await runAgent({ base: new URL(url), token, concurrency, ask });
     console.log(`answered ${answered}, failed ${failed}`);
   } catch (error) {
     console.error((error as Error).message);
