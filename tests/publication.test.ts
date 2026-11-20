@@ -5,6 +5,7 @@
 import { CATEGORY_LABELS } from "@hotmoto/contracts/taxonomy";
 import { withSubject } from "@hotmoto/site";
 import { siteDate } from "@hotmoto/contracts/time";
+import { SITE_LANGUAGE } from "@hotmoto/contracts/language";
 import { ogEtag } from "@hotmoto/backend/media/og";
 import { posterEtag } from "@hotmoto/backend/media/poster";
 import { tag } from "./setup.ts";
@@ -75,18 +76,18 @@ test("Markdown preserves a table's headings, caption, links, alignment and multi
   const id = await article();
   const table = '<table><caption>Benchmark results</caption><thead><tr><th>Model</th><th align="right">Score</th></tr></thead><tbody><tr><td><a href="https://example.com/model">A|B</a></td><td>90<br>±1</td></tr></tbody></table>';
   await sql`UPDATE articles SET language = 'en', body_html = ${table} WHERE id = ${id}`;
-  await sql`INSERT INTO translations (article_id, revision, body_html, body_text, origin) VALUES (${id}, 1, ${table.replace('Benchmark results', '基准结果').replace('Model', '模型').replace('Score', '分数')}, '基准结果', 'source')`;
+  await sql`INSERT INTO translations (article_id, lang, revision, body_html, body_text, origin) VALUES (${id}, ${SITE_LANGUAGE}, 1, ${table.replace('Benchmark results', 'ベンチマーク結果').replace('Model', 'モデル').replace('Score', 'スコア')}, 'ベンチマーク結果', 'source')`;
   await publishArticle(id, released());
   const response = await get(`/items/${id}/markdown`);
   assert.equal(response.status, 200);
   const $ = cheerio.load(marked.parse(response.body, { async: false, gfm: true }));
   assert.equal($('table').length, 2, 'both original and translated tables survive export');
-  assert.deepEqual($('table th').toArray().map((node) => $(node).text()), ['模型', '分数', 'Model', 'Score']);
+  assert.deepEqual($('table th').toArray().map((node) => $(node).text()), ['モデル', 'スコア', 'Model', 'Score']);
   assert.equal($('table th').last().attr('align'), 'right');
   assert.equal($('table td a').last().text(), 'A|B');
   assert.equal($('table td a').last().attr('href'), 'https://example.com/model');
   assert.equal($('table td').last().find('br').length, 1);
-  assert.ok($.text().includes('基准结果') && $.text().includes('Benchmark results'));
+  assert.ok($.text().includes('ベンチマーク結果') && $.text().includes('Benchmark results'));
 });
 
 test("Markdown retains tables that cannot be represented without changing their meaning", async () => {
@@ -125,21 +126,21 @@ test("Markdown retains numeric superscripts, subscripts and fenced code while re
 test("site reading sends one language while exports retain both, including after withdrawal", async () => {
   const id = await article();
   await sql`UPDATE articles SET language = 'en', body_html = '<h2>Original heading</h2><p>Original full body</p>' WHERE id = ${id}`;
-  await sql`INSERT INTO translations (article_id, revision, body_html, body_text, origin) VALUES (${id}, 1, '<h2>译文标题</h2><p>中文完整正文</p>', '中文完整正文', 'source')`;
+  await sql`INSERT INTO translations (article_id, lang, revision, body_html, body_text, origin) VALUES (${id}, ${SITE_LANGUAGE}, 1, '<h2>訳文の見出し</h2><p>日本語の完全な本文</p>', '日本語の完全な本文', 'source')`;
   await publishArticle(id, released());
   const normal = JSON.parse((await get(`/api/site/items/${id}`)).body);
   const original = JSON.parse((await get(`/api/site/items/${id}/original`)).body);
   assert.equal(normal.bodyLanguage, 'zh');
   assert.equal(normal.hasTranslation, true);
   assert.equal(normal.body.original, null);
-  assert.ok(normal.body.zh.includes('中文完整正文'));
-  assert.equal(normal.outline[0].text, '译文标题');
+  assert.ok(normal.body.zh.includes('日本語の完全な本文'));
+  assert.equal(normal.outline[0].text, '訳文の見出し');
   assert.equal(original.bodyLanguage, 'original');
   assert.equal(original.body.zh, null);
   assert.ok(original.body.original.includes('Original full body'));
   assert.equal(original.outline[0].text, 'Original heading');
   const md = (await get(`/items/${id}/markdown`)).body;
-  assert.ok(md.includes('Original full body') && md.includes('中文完整正文'));
+  assert.ok(md.includes('Original full body') && md.includes('日本語の完全な本文'));
   await setVisibility(id, { visibility: 'withdrawn', reason: 'test', version: 0 }, 'test');
   assert.equal((await get(`/api/site/items/${id}/original`)).status, 404);
 });
@@ -436,11 +437,11 @@ test("share images keep detail metadata and access rules while conditional reads
   const id = await article();
   await publishArticle(id, released());
   const d = JSON.parse((await get(`/api/site/items/${id}`)).body);
-  const kicker = d.category ? CATEGORY_LABELS[d.category as keyof typeof CATEGORY_LABELS] : withSubject("动态");
+  const kicker = d.category ? CATEGORY_LABELS[d.category as keyof typeof CATEGORY_LABELS] : withSubject("ニュース");
   const source = d.source.name;
   const date = siteDate(d.timelineAt);
   const card = { kicker, title: d.title, subtitle: d.summary, meta: `${source} · ${date}`,
-    badge: d.selected && d.score !== null ? { value: String(Math.round(d.score)), label: "精选评分" } : null };
+    badge: d.selected && d.score !== null ? { value: String(Math.round(d.score)), label: "厳選スコア" } : null };
   const poster = { url: `${config.siteUrl}/items/${id}`, kicker, title: d.title, summary: d.summary, source, date, score: d.selected ? d.score : null };
   const paths = [[`/og/items/${id}.png`, `"og-${ogEtag(card)}"`], [`/og/posters/${id}.png`, `"poster-${posterEtag(poster)}"`]];
   const queries: string[] = [];
