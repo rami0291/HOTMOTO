@@ -19,8 +19,10 @@ const app = await buildApp();
 const ids: Record<string, string> = {};
 
 async function item(name: string, relevance: "pass" | "block", label: string, hoursAgo: number) {
+  // The timeline sorts by discovery, so each item is discovered when it was published.
+  const at = new Date(Date.now() - hoursAgo * 3600_000);
   const { articleId } = await upsertMaterial({ sourceId: SOURCE, url: `https://example.org/${T}/${name}`, title: `${T} ${name}`,
-    bodyText: "A motorcycle item.", bodyStatus: "ok", via: "fetch", publishedAt: new Date(Date.now() - hoursAgo * 3600_000) });
+    bodyText: "A motorcycle item.", bodyStatus: "ok", via: "fetch", publishedAt: at, discoveredAt: at });
   await sql`INSERT INTO analyses(article_id,input_revision,origin,relevance,category,tags,title_zh,summary_zh,score,selected,output)
     VALUES (${articleId},1,'model',${relevance},null,'{}',${`${T} ${name} の記事`},${relevance === "pass" ? "二輪の記事。" : ""},null,false,
       ${sql.json({ prefilter: { label, reason: "テスト" } })})`;
