@@ -12,6 +12,7 @@ import { closeDb, sql } from "@hotmoto/backend/db";
 import { upsertMaterial } from "@hotmoto/backend/content/materials";
 import { analyzeArticle, buildMaterial, loadAnalyzeInput, normalizeStructure, StructureSchema, tierThreshold, UNDERSTAND_FLOOR } from "@hotmoto/backend/editorial/analyze";
 import { queueProcessing } from "@hotmoto/backend/jobs/content";
+import { publishArticle } from "@hotmoto/backend/publication/publish";
 import { QUEUES, stopBoss } from "@hotmoto/backend/jobs/queue";
 import { compactAnswerFirstSummary, enforceIdentity, MAX_BODY_CHARS, parseTranslateOutput } from "@hotmoto/backend/editorial/writing";
 import { promptText } from "@hotmoto/backend/editorial/prompts";
@@ -23,7 +24,7 @@ const X_SOURCE = `test-analyze-x-${T}`;
 
 interface Req { step: AnalysisStep; marker: string; user: string }
 const requests: Req[] = [];
-const MARKERS = ["CLEAR", "RESCUE", "LOW", "OFFTOPIC", "BARE", "VAGUE", "THIN", "SENSITIVE", "ツイート"];
+const MARKERS = ["CLEAR", "RESCUE", "LOW", "OFFTOPIC", "PROMO", "BARE", "VAGUE", "THIN", "SENSITIVE", "ツイート"];
 // The scores sit a few points around the pack's T1 threshold and understand floor, so each case means
 // the same after a site recalibrates them: selected when the two add up to 2 × T1, written like a
 // selected item when they add up to more than 2 × FLOOR, translated otherwise.
@@ -43,6 +44,7 @@ const provider = await stub((_hit, req) => {
   const marker = MARKERS.find((m) => user.includes(m)) ?? "";
   requests.push({ step, marker, user });
   const answer = (content: unknown) => ({ id: `stub-${requests.length}`, model: "stub", choices: [{ message: { content: typeof content === "string" ? content : JSON.stringify(content) } }], usage: { prompt_tokens: 10, completion_tokens: 5, total_tokens: 15 } });
+  if (step === "prefilter" && marker === "PROMO") return answer({ label: "aside", reason: "セールの宣伝", title: `  マフラーのセール  ${"長".repeat(100)}` });
   if (step === "prefilter") return answer({ label: marker === "OFFTOPIC" || marker === "BARE" ? "BLOCK" : marker === "VAGUE" ? "UNKNOWN" : "PASS", reason: "テスト" });
   if (step === "score") return answer({ attentionScore: scoreAnswers[marker]!.shift() });
   if (step === "understand") {
@@ -171,6 +173,23 @@ test("the prefilter's BLOCK stops everything; UNKNOWN goes on like PASS", async 
   const bare = await analyzeArticle(await article("BARE", { bodyText: null, excerpt: null, bodyStatus: "none" }));
   assert.deepEqual([bare!.output!.relevance, bare!.output!.selected, bare!.output!.score], ["unknown", false, FLOOR - 3]);
   assert.deepEqual(calls("BARE").sort(), ["prefilter", "score", "score", "structure"]);
+});
+
+test("the prefilter's ASIDE stops everything like BLOCK, keeps its own title, and puts the item on the aside shelf", async () => {
+  const id = await article("PROMO");
+  const res = await analyzeArticle(id);
+  assert.deepEqual([res!.output!.relevance, res!.output!.selected, res!.output!.score], ["block", false, null]);
+  assert.deepEqual(calls("PROMO"), ["prefilter"], "no score, structure or writing for material set aside");
+  const r = await row(id);
+  assert.equal(r.output.prefilter.label, "ASIDE");
+  assert.equal(r.title_zh, `マフラーのセール ${"長".repeat(71)}`, "the prefilter's title, collapsed and cut to 80 characters");
+  await publishArticle(id);
+  const [p] = await sql<{ aside: boolean; eligible: boolean; title: string }[]>`SELECT aside, eligible, title FROM publications WHERE article_id = ${id}`;
+  assert.deepEqual([p!.aside, p!.eligible, p!.title], [true, false, r.title_zh]);
+  // Failure case: a plain BLOCK lands on the shelf too.
+  const offId = (await sql<{ id: string }[]>`SELECT id FROM articles WHERE url = ${`https://example.com/OFFTOPIC-${T}`}`)[0]!.id;
+  await publishArticle(offId);
+  assert.equal((await sql<{ aside: boolean }[]>`SELECT aside FROM publications WHERE article_id = ${offId}`)[0]!.aside, false);
 });
 
 test("a feed summary alone: the article page is fetched first, then the whole article is judged", async () => {

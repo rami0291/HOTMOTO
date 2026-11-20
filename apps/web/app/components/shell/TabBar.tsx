@@ -36,10 +36,10 @@ export function TabBar({ changelogVersion }: { changelogVersion: string | null }
   return (
     <nav
       aria-label="下部ナビゲーション"
-      className="pointer-events-none fixed inset-x-0 bottom-0 z-40 px-[max(10px,env(safe-area-inset-left))] pb-[max(8px,env(safe-area-inset-bottom))] lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-frame bg-bg pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] lg:hidden"
     >
-      {/* A raised pill floating over the page's foot; the tab in use sits pressed into it. */}
-      <div className={`pointer-events-auto mx-auto grid h-[58px] max-w-[620px] gap-1 rounded-sheet border border-edge bg-surface/92 p-1.5 shadow-[var(--shadow-card)] backdrop-blur-xl backdrop-saturate-150 ${COLUMNS[items.length]}`}>
+      {/* A bar docked to the foot; the tab in use is a mass block with the signal tick along its top. */}
+      <div className={`mx-auto grid h-[56px] max-w-[640px] gap-px p-1 ${COLUMNS[items.length]}`}>
         {items.map((t) => {
           const on = t.key === active;
           const Icon = t.icon;
@@ -61,11 +61,12 @@ export function TabBar({ changelogVersion }: { changelogVersion: string | null }
                   void revalidator.revalidate();
                 }
               }}
-              className={`relative flex flex-col items-center justify-center gap-[1px] rounded-tile text-[10.5px] transition-[box-shadow,color] duration-200 ${on ? "neu-inset font-semibold text-accent" : "text-ink-3 active:text-ink active:shadow-[var(--shadow-inset-sm)]"}`}
+              className={`relative flex flex-col items-center justify-center gap-[1px] text-[10.5px] transition-[box-shadow,color] duration-200 ${on ? "mass-face font-semibold" : "text-ink-3 active:bg-bg-sunk active:text-ink"}`}
             >
+              {on && <span className="absolute inset-x-0 top-0 h-1 bg-signal-on-mass" aria-hidden="true" />}
               <Icon size={21} />
               <span>{t.label}</span>
-              {dot && t.changelog && <span className="absolute left-[calc(50%+9px)] top-[5px] size-1.5 rounded-full bg-hot" aria-label="新しい更新があります" />}
+              {dot && t.changelog && <span className="absolute left-[calc(50%+9px)] top-[7px] size-2 border border-mass bg-signal" aria-label="新しい更新があります" />}
             </Link>
           );
         })}

@@ -18,6 +18,11 @@ export function listedCondition(now: Date) {
   return sql`p.visibility = 'public' AND p.eligible AND ${releasedCondition(now)}`;
 }
 
+/** On the aside shelf at `now`: public, set aside by the prefilter (never pool eligible), within the last `days`. */
+export function asideCondition(now: Date, days: number) {
+  return sql`p.visibility = 'public' AND p.aside AND p.timeline_at > ${new Date(now.getTime() - days * 86_400_000)}`;
+}
+
 /** Story reports include older editorial material outside the pool, but never withdrawn or not yet released content. */
 export function storyReportCondition(now: Date) {
   return sql`p.visibility = 'public' AND s.participation_mode = 'editorial' AND ${releasedCondition(now)}`;

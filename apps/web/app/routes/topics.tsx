@@ -102,7 +102,7 @@ export default function TopicsPage() {
     <div className="pb-10">
       <PhoneBar back={{ to: "/more", label: "マイページ" }} title="トピック" />
       <header className="pb-2 pt-3 lg:pt-1">
-        <h1 data-page-title="" className="text-[24px] font-semibold leading-[1.3] text-ink">{`トピックで見る${SITE.subject}`}</h1>
+        <h1 data-page-title="" className="t-display text-[28px] leading-[1.15] text-ink lg:text-[34px]">{`トピックで見る${SITE.subject}`}</h1>
         <p className="mt-1.5 text-[13px] leading-relaxed text-ink-3">
           {`${groups.map((g) => g.name).join("、")}ごとに `}
           <span className="num">{topics.length}</span> のトピックを閲覧し、最新の厳選と重要な進展を追えます。
@@ -116,7 +116,7 @@ export default function TopicsPage() {
             </h2>
             <p className="text-[12px] text-ink-4">{g.blurb}</p>
           </div>
-          <ul className="mt-3 divide-y divide-line-soft overflow-hidden rounded-card border border-line bg-surface lg:mt-3.5 lg:grid lg:grid-cols-3 lg:gap-3 lg:divide-y-0 lg:overflow-visible lg:rounded-none lg:border-0 lg:bg-transparent xl:grid-cols-4">
+          <ul className="mt-3 divide-y divide-line-soft overflow-hidden border border-line bg-surface lg:mt-3.5 lg:grid lg:grid-cols-3 lg:gap-3 lg:divide-y-0 lg:overflow-visible lg:rounded-none lg:border-0 lg:bg-transparent xl:grid-cols-4">
             {topics
               .filter((t) => t.group === g.key)
               .map((t) => (

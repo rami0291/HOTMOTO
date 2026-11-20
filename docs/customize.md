@@ -79,7 +79,7 @@ AGENTS.md と docs/customize.md を読んで、このサイトを「○○業界
 
 | ファイル | 役割 |
 |---|---|
-| `prefilter.md` | 予備選別：この資料がこの業界の話か。広めに拾い、明らかに無関係なものだけを止める |
+| `prefilter.md` | 予備選別：この資料がこの業界の話か。広めに拾い、明らかに無関係なものだけを止める。業界の話でもニュースではないもの（広告など）は `ASIDE` で棚に回す |
 | `selection-score.md` | **採点基準**：0〜100 点。内容タイプ、5 つの軸、タイプごとの重み、普通に評価すべき価値、抑えるべきノイズ |
 | `content-understanding.md` | 入選と入選に近い内容の書き方：日本語のタイトル、答えを先に書く要約、注目ポイント（タグも付けるが、ページのカテゴリとタグは `structure.md` から来る） |
 | `rules-domain.md` | 業界用語の訳し方と残し方（いまは二輪の用語：bike はバイク、registrations は登録台数、型式は一字も変えない……） |
@@ -107,7 +107,7 @@ AGENTS.md と docs/customize.md を読んで、このサイトを「○○業界
 
 ## 6. ブランド：`site/brand/`
 
-- `logo.svg`、`icon.png`（512）、`icon-192.png`、`apple-icon.png`（180）、`favicon.ico`：サイトのアイコン。
+- `logo.svg`、`icon.png`（512）、`icon-192.png`、`apple-icon.png`（180）、`favicon.ico`、`logo.png`（1024）：サイトのアイコン。既定の切り欠きのブロックは `node scripts/icons.ts` で書き出します。自分の画像を置くなら、このスクリプトは使いません。
 - `Logo.tsx`：ウェブの左上のサイト名のロゴ。既定ではサイト名を文字で組みます。自分のロゴがあれば、`Wordmark` を自分の SVG に替えます（引数は同じに保つ）。
 - `wordmark.svg`、`wordmark-dark.svg`（任意）：シェア画像とポスターの文字ロゴ。暗い版は暗いシェア画像に使います。なければサイト名の文字を使います。
 - `nameplates/`：日報・週報・月報のページ上部の題字（「二輪日報」など）。業界名を変えたら作り直します：
@@ -115,6 +115,8 @@ AGENTS.md と docs/customize.md を読んで、このサイトを「○○業界
   npm pack @fontsource/noto-sans-jp@5.3.0 && tar xzf fontsource-noto-sans-jp-5.3.0.tgz
   node scripts/nameplates.ts package
   ```
+- `drawings/`：ページの下に薄い灰色で敷く線画。`map.svg`（測量図）と `engine.svg`（エンジンの分解図）は `node scripts/drawings.ts` で作り、`moto.svg`（二輪の側面図）は手で描いた 1 枚の SVG です。どれも `#000` の線だけで描き（白い塗りで隠さない）、ページは形だけを使って色を付けます。業界を変えたら、分解図と側面図をその業界のものに替えます。
+- 色、書体、切り欠きなどの見た目は `apps/web/app/app.css` の先頭のトークンにまとまっています。
 - About ページの QR コード：管理画面の「設定」でアップロードするか、画像を `site/brand/contact/` に置きます。
 
 hotmoto の名前とロゴは使わないでください。

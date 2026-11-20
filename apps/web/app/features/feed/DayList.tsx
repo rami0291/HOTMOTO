@@ -47,7 +47,7 @@ export function DayList({ items, todayCount = null, headerAside }: { items: Feed
 export function Pagination({ page, pageCount, href }: { page: number; pageCount: number; href: (p: number) => string }) {
   if (pageCount <= 1) return null;
   const pages = [...new Set([1, pageCount, page - 2, page - 1, page, page + 1, page + 2].filter((p) => p >= 1 && p <= pageCount))].sort((a, b) => a - b);
-  const btn = "inline-flex h-9 min-w-9 items-center justify-center rounded-full px-2.5 text-[13px] transition-colors";
+  const btn = "inline-flex h-9 min-w-9 items-center justify-center px-2.5 text-[13px] transition-colors";
   return (
     <nav aria-label="ページ送り" className="mt-6 flex flex-wrap items-center justify-center gap-3 lg:gap-1">
       {page > 1 && (
@@ -64,7 +64,7 @@ export function Pagination({ page, pageCount, href }: { page: number; pageCount:
           <Link
             to={href(p)}
             aria-current={p === page ? "page" : undefined}
-            className={`num ${btn} ${p === page ? "bg-ink font-semibold text-bg" : "text-ink-3 hover:bg-bg-sunk hover:text-ink"}`}
+            className={`num ${btn} ${p === page ? "mass-face font-semibold" : "text-ink-3 hover:bg-bg-sunk hover:text-ink"}`}
           >
             {p}
           </Link>

@@ -78,7 +78,7 @@ function Toggle({ open, onToggle, children }: { open: boolean; onToggle: () => v
 function Panel({ open, children }: { open: boolean; children: ReactNode }) {
   return (
     <Collapse open={open} className="relative z-10">
-      <div className="mt-2 rounded-control bg-bg-sunk px-3 py-2 dark:bg-bg-muted/60">{children}</div>
+      <div className="mt-2 border-t border-line bg-bg-sunk px-3 py-2">{children}</div>
     </Collapse>
   );
 }
@@ -159,7 +159,7 @@ export function GroupButton({ group, filters, parentId }: { group: GroupInfo; fi
         }}
         aria-expanded={open}
         aria-haspopup="dialog"
-        className="relative z-10 mt-2 flex min-h-11 w-full items-center justify-between rounded-tile bg-bg-sunk px-3 py-2 text-left text-[12.5px] text-ink-4 transition-colors active:bg-bg-muted lg:hidden dark:bg-bg-muted/60 dark:active:bg-bg-muted"
+        className="relative z-10 mt-2 flex min-h-11 w-full items-center justify-between bg-bg-sunk px-3 py-2 text-left text-[12.5px] text-ink-4 transition-colors active:bg-bg-muted lg:hidden"
       >
         {labelOf(group)}
         <IconChevronRight size={14} />
@@ -193,7 +193,7 @@ function GroupSheet({ open, onClose, group, filters, parentId }: {
                 </span>
                 <span className="mt-0.5 line-clamp-2 text-[15px] leading-[1.5] text-ink-2">{r.title}</span>
               </Link>
-              <a href={r.originalUrl} target="_blank" rel="noopener noreferrer" aria-label="原文を開く" className="-mr-2 grid size-11 shrink-0 place-items-center rounded-full text-ink-4 active:bg-bg-sunk">
+              <a href={r.originalUrl} target="_blank" rel="noopener noreferrer" aria-label="原文を開く" className="-mr-2 grid size-11 shrink-0 place-items-center text-ink-4 active:bg-bg-sunk">
                 <IconArrowUpRight size={16} />
               </a>
             </li>

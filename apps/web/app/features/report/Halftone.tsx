@@ -1,11 +1,16 @@
 // The date in the masthead's ear as a signal board: text drawn on a canvas as a halftone of dots, the
-// accent part in the brand teal and the rest in ink, over a faint grid of unlit dots and the text's own
+// accent part in the signal ink and the rest in ink, over a faint grid of unlit dots and the text's own
 // faint silhouette. The dot texture comes from `seed` (the issue), so every
 // issue's board differs. Dots print in from the left on load and light up under the pointer; reduced
 // motion gets the still board.
 // The real text stays in the page (for search, screen readers and before the script runs); the canvas
 // covers it once drawn. Mark the accent part of `children` with data-accent.
 import { useEffect, useRef, useState, type ReactNode } from "react";
+
+const STRETCH: Record<string, string> = {
+  "62.5%": "extra-condensed", "75%": "condensed", "87.5%": "semi-condensed", "100%": "normal",
+  "112.5%": "semi-expanded", "125%": "expanded", "150%": "extra-expanded",
+};
 
 interface Dot {
   x: number;
@@ -155,7 +160,8 @@ export function Halftone({ seed, className = "", children }: { seed: string; cla
         const el = node.parentElement!;
         const style = getComputedStyle(el);
         const accent = !!el.closest("[data-accent]");
-        m.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+        // The canvas font takes width only as a keyword (the widened display cut is 125%: "expanded").
+        m.font = `${style.fontWeight} ${STRETCH[style.fontStretch] ?? "normal"} ${style.fontSize} ${style.fontFamily}`;
         m.fillStyle = accent ? "#f00" : "#00f";
         fontSize = Math.max(fontSize, parseFloat(style.fontSize));
         const text = node.textContent ?? "";

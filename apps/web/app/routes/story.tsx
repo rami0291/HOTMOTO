@@ -135,7 +135,7 @@ function TimelineRow({ r }: { r: StoryReportView }) {
               {r.summary}
             </p>
             {(clamped || open) && (
-              <button type="button" onClick={() => setOpen(!open)} aria-expanded={open} className="mt-1 text-[12.5px] text-note transition-colors hover:text-accent">
+              <button type="button" onClick={() => setOpen(!open)} aria-expanded={open} className="mt-1 text-[12.5px] text-ink-3 transition-colors hover:text-accent">
                 {open ? "要約を閉じる" : "要約を開く"}
               </button>
             )}
@@ -242,7 +242,7 @@ export default function StoryPage() {
         </div>
       </header>
 
-      <div className="bleed sticky top-[var(--bar-h)] z-20 mt-5 bg-bg/90 py-2 backdrop-blur-md lg:mx-0 lg:px-0">
+      <div className="bleed sticky top-[var(--bar-h)] z-20 mt-5 bg-bg py-2 lg:mx-0 lg:px-0">
         <PillTabs
           size="sm"
           layoutId="story-sections"
@@ -301,7 +301,7 @@ export default function StoryPage() {
               <ol className="relative space-y-4 pl-5 before:absolute before:bottom-2 before:left-[3px] before:top-2 before:w-px before:bg-line">
                 {developments.map((d) => (
                   <li key={d.factId} className="relative">
-                    <span className={`absolute -left-5 top-[7px] size-[7px] rounded-full ring-4 ring-surface ${d.factId === story.developments[0]?.factId ? "bg-accent" : "bg-line-strong"}`} aria-hidden="true" />
+                    <span className={`absolute -left-5 top-[7px] size-[7px] ring-4 ring-surface ${d.factId === story.developments[0]?.factId ? "bg-accent" : "bg-line-strong"}`} aria-hidden="true" />
                     <div className="num text-[12px] text-ink-4">
                       {monthDayTime(d.firstReportAt)} · 報道 {d.reportCount} 本
                     </div>

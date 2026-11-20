@@ -1,4 +1,10 @@
 @import "tailwindcss";
+/* Self-hosted faces: Archivo (variable width, for the wide display cut), Chakra Petch (labels),
+   JetBrains Mono (figures). Japanese falls through to the system's Japanese gothic. */
+@import "@fontsource-variable/archivo/wdth.css";
+@import "@fontsource/chakra-petch/500.css";
+@import "@fontsource/chakra-petch/600.css";
+@import "@fontsource-variable/jetbrains-mono/index.css";
 /* Classes also live in the site's logo and changelog drawings (site/brand, site/changelog) and in the
    modules' web code (their other files are not scanned: words in backend code and data would become classes). */
 @source "../../../site/brand";
@@ -6,11 +12,12 @@
 @source "../../../modules/*/{web.tsx,web/**}";
 
 /* ---------------------------------------------------------------------------
-   Design tokens: soft UI (neumorphism) on a pale lavender ground. Surfaces share
-   the page's hue and are shaped by two lights — a white highlight from the top
-   left and a violet-grey shade to the bottom right — raised for what can be
-   pressed or read as a unit, inset for fields, tracks and what is chosen. One
-   violet accent (a light lavender in dark); text keeps WCAG AA on every ground.
+   Design tokens: a field manual printed over acid graphics. A flat ground (cool
+   alloy grey in light, anodised black in dark), one heavy ink (`mass`, the
+   ground's opposite), a steel grey for bands and plates, and one signal colour
+   (CRT acid green in light, rescue orange in dark) that never sits bare on the
+   ground: it always touches `mass`. No shadows, no gradients, no translucent
+   layers; depth comes from overlap. Corners are 45° chamfers, never rounds.
    Components use the semantic names below; values change per theme only.
    --------------------------------------------------------------------------- */
 
@@ -19,8 +26,11 @@
 @custom-variant touch (@media (hover: none));
 
 @theme {
-  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "HarmonyOS Sans SC", "Microsoft YaHei", sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  --font-jp: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic UI", "Yu Gothic", Meiryo, sans-serif;
+  --font-sans: "Archivo Variable", var(--font-jp);
+  --font-display: "Archivo Variable", var(--font-jp);
+  --font-tech: "Chakra Petch", var(--font-jp);
+  --font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, Consolas, var(--font-jp);
 
   /* Semantic colours. */
   --color-bg: var(--bg);
@@ -29,9 +39,6 @@
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
   --color-raised: var(--raised);
-  --color-sidebar: var(--sidebar);
-  --color-daybar: var(--daybar);
-  --color-field: var(--field);
   --color-ink: var(--ink);
   --color-ink-2: var(--ink-2);
   --color-ink-3: var(--ink-3);
@@ -39,36 +46,24 @@
   --color-line: var(--line);
   --color-line-strong: var(--line-strong);
   --color-line-soft: var(--line-soft);
+  --color-frame: var(--frame);
   --color-accent: var(--accent);
   --color-accent-ink: var(--accent-ink);
   --color-accent-soft: var(--accent-soft);
-  --color-accent-softer: var(--accent-softer);
   --color-accent-contrast: var(--accent-contrast);
-  --color-lavender: var(--lavender);
-  --color-edge: var(--edge);
-  --color-note: var(--note);
+  --color-mass: var(--mass);
+  --color-on-mass: var(--on-mass);
+  --color-steel: var(--steel);
+  --color-signal: var(--signal);
+  --color-on-signal: var(--on-signal);
+  --color-signal-on-mass: var(--signal-on-mass);
+  --color-draft: var(--draft);
   --color-hot: var(--hot);
   --color-hot-soft: var(--hot-soft);
   --color-amber: var(--amber);
-  --color-amber-ink: var(--amber-ink);
   --color-amber-soft: var(--amber-soft);
   --color-ok: var(--ok);
   --color-ok-soft: var(--ok-soft);
-  --color-ok-ink: var(--ok-ink);
-  --color-rank-1: var(--rank-1);
-  --color-rank-2: var(--rank-2);
-  --color-rank-3: var(--rank-3);
-  --color-rank-rest: var(--rank-rest);
-
-  /* Radius scale, generous as soft UI wants it: mark 6 (inline code, kbd, tiny tags and swatches),
-     control 12 (inputs, small blocks), tile 14 (list rows, hover areas), card 20, panel 20 (wells,
-     pictures), sheet 24 (dialogs, sheets, hero shells); pills are rounded-full. Arbitrary radii are not used. */
-  --radius-mark: 6px;
-  --radius-control: 12px;
-  --radius-tile: 14px;
-  --radius-card: 20px;
-  --radius-panel: 20px;
-  --radius-sheet: 24px;
 
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
 
@@ -84,74 +79,64 @@
   /* Page widths follow the screen's shape. Lists fill the screen up to 21:9
      and centre beyond it (32:9); reading pages fill a 16:9 screen and centre on wider ones. A browser
      window is shorter than its screen (tabs, address bar), so a 16:9 screen gives a window of about 2:1
-     and a 21:9 screen one of about 2.7:1. 236px is the sidebar and the main area's padding. */
-  --page-max-wide: max(1200px, calc(270dvh - 236px));
-  --page-max-reading: max(1100px, calc(200dvh - 236px));
+     and a 21:9 screen one of about 2.7:1. 256px is the sidebar and the main area's padding. */
+  --page-max-wide: max(1200px, calc(270dvh - 256px));
+  --page-max-reading: max(1100px, calc(200dvh - 256px));
   /* The phone shell (below lg): the top bar's height, which sticky headers inside pages sit below, and
      side gutters that keep clear of the notch in landscape. The desktop shell has no top bar. */
   --bar-h: 48px;
   --gutter-l: max(16px, env(safe-area-inset-left));
   --gutter-r: max(16px, env(safe-area-inset-right));
+  /* The one angle, the chamfers cut at it, and the three spatial frequencies (hairline, mark, block). */
+  --angle-shear: 45deg;
+  --cut-sm: 8px;
+  --cut-md: 16px;
+  --cut-lg: 32px;
+  --freq-micro: 4px;
+  --freq-meso: 24px;
+  --freq-macro: 96px;
+  /* Sonar Alloy: oxidised aluminium ground, asphalt green-black ink, CRT acid green signal. */
   color-scheme: light;
-  --bg: #ece8f5;
-  --bg-sunk: #e4dff0;
-  --bg-muted: #dcd6eb;
-  --surface: #f1eef9;
-  --surface-2: #efebf7;
-  --raised: #f5f3fc;
-  --sidebar: #ece8f5;
-  --daybar: #e8e4f3;
-  --field: #e4dff0;
-  --ink: #2a2541;
-  --ink-2: #3a3454;
-  --ink-3: #575073;
-  --ink-4: #5f587a;
-  --line: #dcd5ec;
-  --line-strong: #cbc2e2;
-  --line-soft: #e2dcf0;
-  --accent: #6646c6;
-  --accent-ink: #5535b3;
-  --accent-soft: rgba(124, 95, 224, 0.12);
-  --accent-softer: rgba(124, 95, 224, 0.06);
-  --accent-contrast: #ffffff;
-  /* The light violet the palette is named for: glows, the rail's dots, gradients; never text. */
-  --lavender: #b8a6f4;
-  --accent-from: #8366e2;
-  --accent-to: #6143c2;
-  --note: #5c5280;
-  --hot: #ae2f45;
-  --hot-soft: rgba(174, 47, 69, 0.09);
-  --amber: #b8873a;
-  --amber-ink: #7a5520;
-  --amber-soft: rgba(184, 135, 58, 0.12);
-  --ok: #276a4d;
-  --ok-soft: rgba(39, 106, 77, 0.1);
-  --ok-ink: #24624a;
-  --rank-1: #ae2f45;
-  --rank-2: #9a4b28;
-  --rank-3: #82591b;
-  --rank-rest: #6b6485;
-  /* The two lights. --edge is the thin highlight along a raised surface's rim. */
-  --neu-shade: rgba(146, 130, 196, 0.42);
-  --neu-light: rgba(255, 255, 255, 0.92);
-  --edge: rgba(255, 255, 255, 0.6);
-  --shadow-card: 6px 6px 14px var(--neu-shade), -6px -6px 14px var(--neu-light);
-  --shadow-card-hover: 10px 10px 22px var(--neu-shade), -8px -8px 20px var(--neu-light);
-  --shadow-soft: 4px 4px 10px var(--neu-shade), -4px -4px 10px var(--neu-light);
-  --shadow-thumb: 2px 2px 5px var(--neu-shade), -2px -2px 5px var(--neu-light);
-  --shadow-pop: 14px 14px 36px rgba(110, 92, 170, 0.3), -8px -8px 24px rgba(255, 255, 255, 0.7);
-  --shadow-inset: inset 3px 3px 7px var(--neu-shade), inset -3px -3px 7px var(--neu-light);
-  --shadow-inset-sm: inset 2px 2px 4px var(--neu-shade), inset -2px -2px 4px var(--neu-light);
-  --shadow-glow: 0 6px 16px rgba(102, 70, 198, 0.32);
-  --prose-ink: #2e2946;
-  --code-bg: #e8e4f3;
-  --code-keyword: #6a3fc0;
-  --code-string: #2f6f44;
-  --code-number: #9a6700;
-  --code-title: #0e6a86;
-  --code-variable: #a13d10;
-  --code-meta: #b42348;
-  --selection: rgba(124, 95, 224, 0.22);
+  --bg: #c5ccc6;
+  --bg-sunk: #b8c0ba;
+  --bg-muted: #a3aca6;
+  --surface: #c5ccc6;
+  --surface-2: #b8c0ba;
+  --raised: #c5ccc6;
+  --ink: #151b18;
+  --ink-2: #1d2420;
+  --ink-3: #3f4843;
+  --ink-4: #454e49;
+  /* Hairlines are decoration (grids, dividers); --line-strong is the 3:1 edge of fields and controls;
+     --frame outlines cards and panels. */
+  --line: #8b958f;
+  --line-strong: #5f6964;
+  --line-soft: #b0b8b2;
+  --frame: #151b18;
+  --mass: #151b18;
+  --on-mass: #c5ccc6;
+  --steel: #78827c;
+  --signal: #a6f724;
+  --on-signal: #151b18;
+  --signal-on-mass: #a6f724;
+  /* The drawings under the pages (map, blueprint, exploded view): a light grey a step off the ground. */
+  --draft: #a7b0aa;
+  /* Signal as text on the ground: the acid green pressed dark enough to read. */
+  --accent: #2e5600;
+  --accent-ink: #1f3d00;
+  --accent-soft: #b8c0ba;
+  --accent-contrast: #c5ccc6;
+  /* Status colours, for errors and warnings in forms and the admin; the public pages use the signal. */
+  --hot: #9c2b14;
+  --hot-soft: #b8c0ba;
+  --amber: #6b5200;
+  --amber-soft: #b8c0ba;
+  --ok: #2e5600;
+  --ok-soft: #b8c0ba;
+  --prose-ink: #1d2420;
+  --code-bg: #b8c0ba;
+  --selection: #a6f724;
+  --on-selection: #151b18;
 }
 
 @media (min-width: 961px) {
@@ -160,65 +145,44 @@
   }
 }
 
+/* Black Box Dark: matte anodised black ground, thermal-paper white ink, rescue orange signal. */
 [data-theme="dark"] {
   color-scheme: dark;
-  --bg: #211e2c;
-  --bg-sunk: #1c1926;
-  --bg-muted: #2a2637;
-  --surface: #25212f;
-  --surface-2: #272333;
-  --raised: #2c2838;
-  --sidebar: #211e2c;
-  --daybar: #1f1c29;
-  --field: rgba(255, 255, 255, 0.05);
-  --ink: #ece8f7;
-  --ink-2: #d6d0e8;
-  --ink-3: #aba4c2;
-  --ink-4: #9690ae;
-  --line: rgba(255, 255, 255, 0.07);
-  --line-strong: rgba(255, 255, 255, 0.11);
-  --line-soft: rgba(255, 255, 255, 0.05);
-  --accent: #b9a5ff;
-  --accent-ink: #cbbbff;
-  --accent-soft: rgba(185, 165, 255, 0.14);
-  --accent-softer: rgba(185, 165, 255, 0.07);
-  --accent-contrast: #1a1530;
-  --lavender: #8e78e0;
-  --accent-from: #c9b9ff;
-  --accent-to: #a48cf6;
-  --note: #b2a6d8;
-  --hot: #f0788a;
-  --hot-soft: rgba(240, 120, 138, 0.13);
-  --amber: #ddb86e;
-  --amber-ink: #ddb86e;
-  --amber-soft: rgba(221, 184, 110, 0.13);
-  --ok: #6fd0a4;
-  --ok-soft: rgba(111, 208, 164, 0.13);
-  --ok-ink: #8adbb6;
-  --rank-1: #f0788a;
-  --rank-2: #e79a72;
-  --rank-3: #ddb86e;
-  --rank-rest: #8e88a6;
-  --neu-shade: rgba(8, 6, 16, 0.6);
-  --neu-light: rgba(255, 255, 255, 0.045);
-  --edge: rgba(255, 255, 255, 0.04);
-  --shadow-card: 6px 6px 14px var(--neu-shade), -5px -5px 12px var(--neu-light);
-  --shadow-card-hover: 10px 10px 22px var(--neu-shade), -7px -7px 16px var(--neu-light);
-  --shadow-soft: 4px 4px 10px var(--neu-shade), -4px -4px 9px var(--neu-light);
-  --shadow-thumb: 2px 2px 5px var(--neu-shade), -2px -2px 5px var(--neu-light);
-  --shadow-pop: 16px 16px 40px rgba(0, 0, 0, 0.55), -6px -6px 18px rgba(255, 255, 255, 0.03);
-  --shadow-inset: inset 3px 3px 7px var(--neu-shade), inset -3px -3px 7px var(--neu-light);
-  --shadow-inset-sm: inset 2px 2px 4px var(--neu-shade), inset -2px -2px 4px var(--neu-light);
-  --shadow-glow: 0 6px 18px rgba(164, 140, 246, 0.25);
-  --prose-ink: #ddd8ec;
-  --code-bg: #1c1926;
-  --code-keyword: #c3a8ff;
-  --code-string: #a9dc76;
-  --code-number: #ffd866;
-  --code-title: #78dce8;
-  --code-variable: #fc9867;
-  --code-meta: #ff6188;
-  --selection: rgba(185, 165, 255, 0.26);
+  --bg: #17181a;
+  --bg-sunk: #202225;
+  --bg-muted: #2c2e32;
+  --surface: #17181a;
+  --surface-2: #202225;
+  --raised: #202225;
+  --ink: #dfdcd5;
+  --ink-2: #d2cfc8;
+  --ink-3: #a3a19b;
+  --ink-4: #8f8d88;
+  --line: #484b51;
+  --line-strong: #6b6e74;
+  --line-soft: #2c2e32;
+  --frame: #6b6e74;
+  --mass: #dfdcd5;
+  --on-mass: #17181a;
+  --steel: #484b51;
+  --signal: #ff4a00;
+  --on-signal: #17181a;
+  --signal-on-mass: #ad3200;
+  --draft: #34363b;
+  --accent: #ff4a00;
+  --accent-ink: #ff7a3d;
+  --accent-soft: #202225;
+  --accent-contrast: #17181a;
+  --hot: #ff8f7d;
+  --hot-soft: #202225;
+  --amber: #e0b44a;
+  --amber-soft: #202225;
+  --ok: #9bd95a;
+  --ok-soft: #202225;
+  --prose-ink: #d2cfc8;
+  --code-bg: #202225;
+  --selection: #ff4a00;
+  --on-selection: #17181a;
 }
 
 @layer base {
@@ -238,11 +202,11 @@
   }
   ::selection {
     background: var(--selection);
+    color: var(--on-selection);
   }
   :focus-visible {
-    outline: 2px solid var(--accent);
+    outline: 2px solid var(--ink);
     outline-offset: 2px;
-    border-radius: 6px;
   }
   a {
     color: inherit;
@@ -267,29 +231,29 @@
     font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
   }
+  /* A small square tag with a hairline edge (topics, tags, counts). */
   .chip {
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
-    height: 1.625rem;
-    padding: 0 0.625rem;
-    border-radius: 9999px;
+    height: 1.5rem;
+    padding: 0 0.5rem;
     font-size: 12px;
     color: var(--ink-3);
     background: var(--surface);
-    border: 1px solid var(--edge);
-    box-shadow: var(--shadow-thumb);
-    transition: color 120ms, box-shadow 160ms var(--ease-out-quart);
+    border: 1px solid var(--line-strong);
+    transition: color 120ms, border-color 120ms;
   }
   a.chip:hover {
-    color: var(--accent);
+    color: var(--ink);
+    border-color: var(--ink);
   }
   a.chip:active {
-    box-shadow: var(--shadow-inset-sm);
+    background: var(--bg-sunk);
   }
   .skeleton {
-    background: var(--bg-muted);
-    border-radius: var(--radius-control);
+    background-color: var(--bg-sunk);
+    background-image: repeating-linear-gradient(-45deg, var(--line-soft) 0 1px, transparent 1px 8px);
     animation: skeleton-pulse 1.6s ease-in-out infinite;
   }
   /* Hide horizontal scrollbars on chip and tab rows that scroll on small screens. */
@@ -335,56 +299,158 @@
   padding-inline: var(--gutter-l) var(--gutter-r);
 }
 
+/* The 45° chamfer: the top-right and bottom-left corners cut at --cut (default cut-md). Clips what
+   overflows, so menus and popovers never live inside a chamfered box. */
+@utility chamfer {
+  clip-path: polygon(0 0, calc(100% - var(--cut, var(--cut-md))) 0, 100% var(--cut, var(--cut-md)), 100% 100%, var(--cut, var(--cut-md)) 100%, 0 calc(100% - var(--cut, var(--cut-md))));
+}
+@utility cut-sm {
+  --cut: var(--cut-sm);
+}
+@utility cut-lg {
+  --cut: var(--cut-lg);
+}
+@utility cut-none {
+  --cut: 0px;
+}
+
 /* Cards are utilities so they take variants (lg:card: a card on desktop, a plain row on phones). A card
-   is raised out of the page in the page's own hue, lit from the top left, with a thin highlight on its rim. */
+   is the ground itself inside a hairline frame chamfered at two corners; the diagonal stroke across each
+   cut corner is drawn by the two background layers. */
 @utility card {
-  background: var(--surface);
-  border: 1px solid var(--edge);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
+  --cut: var(--cut-md);
+  border: 1px solid var(--frame);
+  background:
+    linear-gradient(45deg, transparent calc(50% - 1.5px), var(--frame) calc(50% - 1.5px) 50%, transparent 50%) top right / var(--cut) var(--cut) no-repeat border-box,
+    linear-gradient(45deg, transparent 50%, var(--frame) 50% calc(50% + 1.5px), transparent calc(50% + 1.5px)) bottom left / var(--cut) var(--cut) no-repeat border-box,
+    var(--surface);
+  clip-path: polygon(0 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% 100%, var(--cut) 100%, 0 calc(100% - var(--cut)));
 }
-/* The well: pressed into the page, for what navigates or annotates rather than reads (the report's ear,
-   the hot lead's heat panel, a card's AI note, notes on about and feedback). Radius is set where it is used. */
-@utility well {
-  background-color: color-mix(in srgb, var(--bg-sunk) 72%, transparent);
-  box-shadow: var(--shadow-inset-sm);
-}
+/* A card that is a link: the frame turns to full ink under the pointer. */
 @utility card-hover {
-  transition: box-shadow 220ms var(--ease-out-quart), transform 220ms var(--ease-out-quart);
   &:hover {
-    box-shadow: var(--shadow-card-hover);
-    transform: translateY(-2px);
+    --frame: var(--ink);
   }
 }
-/* Soft controls. neu-raised: a small raised surface that sinks in while pressed (secondary buttons, bar
-   buttons, toggles); neu-inset: a field or a track pressed into the page; neu-primary: the violet button,
-   raised on its own glow. */
-@utility neu-raised {
-  background-color: var(--surface);
-  box-shadow: var(--shadow-soft);
-  transition: box-shadow 160ms var(--ease-out-quart), color 150ms, background-color 150ms, transform 150ms var(--ease-out-quart);
-  &:hover {
-    box-shadow: var(--shadow-card);
-  }
-  &:active {
-    box-shadow: var(--shadow-inset-sm);
-  }
-}
-@utility neu-inset {
+/* The well: a flat sunk ground for what annotates rather than reads (a card's note, a figure's legend,
+   notes on about and feedback). */
+@utility well {
   background-color: var(--bg-sunk);
-  box-shadow: var(--shadow-inset);
 }
-@utility neu-primary {
-  color: var(--accent-contrast);
-  background-image: linear-gradient(135deg, var(--accent-from), var(--accent-to));
-  box-shadow: var(--shadow-glow), var(--shadow-thumb);
-  transition: box-shadow 160ms var(--ease-out-quart), filter 150ms, transform 150ms var(--ease-out-quart);
+/* Controls. plate: a secondary control on the ground in a 3:1 edge that darkens under the pointer; sunk:
+   a field or a track; signal-face: the one primary action, the signal colour inside a mass edge. */
+@utility plate {
+  --cut: var(--cut-sm);
+  border: 1px solid var(--line-strong);
+  background:
+    linear-gradient(45deg, transparent calc(50% - 1.5px), var(--line-strong) calc(50% - 1.5px) 50%, transparent 50%) top right / var(--cut) var(--cut) no-repeat border-box,
+    var(--surface);
+  clip-path: polygon(0 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% 100%, 0 100%);
+  transition: color 150ms, background-color 150ms;
   &:hover {
-    filter: brightness(1.06);
+    border-color: var(--ink);
+    background:
+      linear-gradient(45deg, transparent calc(50% - 1.5px), var(--ink) calc(50% - 1.5px) 50%, transparent 50%) top right / var(--cut) var(--cut) no-repeat border-box,
+      var(--surface);
   }
   &:active {
-    box-shadow: inset 3px 3px 7px rgba(36, 18, 92, 0.35), inset -2px -2px 6px rgba(255, 255, 255, 0.2);
+    background-color: var(--bg-sunk);
   }
+}
+@utility sunk {
+  background-color: var(--bg-sunk);
+  border: 1px solid var(--line-strong);
+}
+@utility signal-face {
+  --cut: var(--cut-sm);
+  color: var(--on-signal);
+  border: 2px solid var(--mass);
+  background:
+    linear-gradient(45deg, transparent calc(50% - 2.5px), var(--mass) calc(50% - 2.5px) 50%, transparent 50%) top right / var(--cut) var(--cut) no-repeat border-box,
+    linear-gradient(45deg, transparent 50%, var(--mass) 50% calc(50% + 2.5px), transparent calc(50% + 2.5px)) bottom left / var(--cut) var(--cut) no-repeat border-box,
+    var(--signal);
+  clip-path: polygon(0 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% 100%, var(--cut) 100%, 0 calc(100% - var(--cut)));
+  &:hover {
+    background:
+      linear-gradient(45deg, transparent calc(50% - 2.5px), var(--mass) calc(50% - 2.5px) 50%, transparent 50%) top right / var(--cut) var(--cut) no-repeat border-box,
+      linear-gradient(45deg, transparent 50%, var(--mass) 50% calc(50% + 2.5px), transparent calc(50% + 2.5px)) bottom left / var(--cut) var(--cut) no-repeat border-box,
+      repeating-linear-gradient(-45deg, transparent 0 6px, color-mix(in srgb, var(--on-signal) 18%, var(--signal)) 6px 12px),
+      var(--signal);
+  }
+  &:focus-visible {
+    outline-offset: 3px;
+  }
+}
+/* A solid mass block with on-mass text: what is chosen, numbered or fixed. */
+@utility mass-face {
+  color: var(--on-mass);
+  background-color: var(--mass);
+}
+
+/* Type that tokens cannot carry. display: Archivo black, widened, upper case (titles, figures, the
+   wordmark); label: Chakra Petch upper case, spaced (navigation, buttons, captions); micro: the 10px mono
+   floor (coordinates, document numbers, rulers); data: mono figures. */
+@utility t-display {
+  font-family: var(--font-display);
+  font-stretch: 125%;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+@utility t-label {
+  font-family: var(--font-tech);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+@utility t-micro {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.3;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+@utility t-data {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Graphic fills. hatch: signal and mass warning tape; hatch-mass: one-ink stripes for what is unfinished
+   or empty; dot-grid: an 8px dot field under figures; streaks: the speed-line band inside a diagonal;
+   hairlines: a ruled block; ruler: a scale with 4/24/96px ticks along the bottom (ruler-v: the left). */
+@utility hatch {
+  background-color: var(--mass);
+  background-image: repeating-linear-gradient(-45deg, var(--signal) 0 8px, transparent 8px 16px);
+}
+@utility hatch-mass {
+  background-image: repeating-linear-gradient(-45deg, currentColor 0 2px, transparent 2px 6px);
+}
+@utility dot-grid {
+  background-image: radial-gradient(var(--line) 1px, transparent 1.3px);
+  background-size: 8px 8px;
+}
+@utility streaks {
+  background-image: repeating-linear-gradient(0deg, var(--bg-muted) 0 6px, transparent 6px 10px, var(--steel) 10px 12px, transparent 12px 21px, var(--mass) 21px 22px, transparent 22px 30px, var(--bg-muted) 30px 44px, transparent 44px 47px);
+}
+@utility hairlines {
+  background-image: repeating-linear-gradient(0deg, currentColor 0 1px, transparent 1px var(--freq-micro));
+}
+@utility ruler {
+  height: 12px;
+  background:
+    repeating-linear-gradient(90deg, currentColor 0 1px, transparent 1px var(--freq-micro)) bottom / 100% 4px no-repeat,
+    repeating-linear-gradient(90deg, currentColor 0 1px, transparent 1px var(--freq-meso)) bottom / 100% 8px no-repeat,
+    repeating-linear-gradient(90deg, currentColor 0 1px, transparent 1px var(--freq-macro)) bottom / 100% 12px no-repeat;
+}
+@utility ruler-v {
+  width: 12px;
+  background:
+    repeating-linear-gradient(0deg, currentColor 0 1px, transparent 1px var(--freq-micro)) left / 4px 100% no-repeat,
+    repeating-linear-gradient(0deg, currentColor 0 1px, transparent 1px var(--freq-meso)) left / 8px 100% no-repeat,
+    repeating-linear-gradient(0deg, currentColor 0 1px, transparent 1px var(--freq-macro)) left / 12px 100% no-repeat;
 }
 
 @keyframes skeleton-pulse {
@@ -399,14 +465,6 @@
 
 @keyframes spin-slow {
   to { transform: rotate(360deg); }
-}
-
-/* The home page's pipeline: a light travelling along the line between the stages. */
-@keyframes hotmoto-flow {
-  from { left: -12%; opacity: 0; }
-  15% { opacity: 1; }
-  85% { opacity: 1; }
-  to { left: 100%; opacity: 0; }
 }
 
 .animate-fade-up {
@@ -464,12 +522,12 @@
   }
   :root[data-vt="push"]::view-transition-new(root) {
     animation: hotmoto-page-in-right 400ms cubic-bezier(0.32, 0.72, 0, 1) both;
-    box-shadow: -10px 0 28px rgba(0, 0, 0, 0.12);
+    box-shadow: -1px 0 0 var(--ink);
   }
   :root[data-vt="back"]::view-transition-old(root) {
     z-index: 1;
     animation: hotmoto-page-out-right 360ms cubic-bezier(0.32, 0.72, 0, 1) both;
-    box-shadow: -10px 0 28px rgba(0, 0, 0, 0.12);
+    box-shadow: -1px 0 0 var(--ink);
   }
   :root[data-vt="back"]::view-transition-new(root) {
     animation: hotmoto-page-in-left 360ms cubic-bezier(0.32, 0.72, 0, 1) both;
@@ -529,37 +587,34 @@
 .prose a {
   color: var(--accent);
   text-decoration: underline;
-  text-decoration-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  text-decoration-thickness: 1px;
   text-underline-offset: 3px;
-  transition: text-decoration-color 120ms;
 }
-.prose a:hover { text-decoration-color: var(--accent); }
+.prose a:hover { color: var(--ink); text-decoration-thickness: 2px; }
 .prose strong, .prose b { color: var(--ink); font-weight: 650; }
 .prose ul, .prose ol { padding-left: 1.4em; }
-.prose ul { list-style: disc; }
+.prose ul { list-style: square; }
 .prose ol { list-style: decimal; }
 .prose li + li { margin-top: 0.35em; }
-.prose li::marker { color: var(--ink-4); }
+.prose li::marker { color: var(--ink-4); font-family: var(--font-mono); }
 .prose blockquote {
-  border-left: 3px solid var(--lavender);
+  border-left: 3px solid var(--mass);
   padding: 0.1em 0 0.1em 1em;
   color: var(--ink-3);
 }
 .prose img, .prose video {
-  border-radius: var(--radius-tile);
   margin-inline: auto;
   height: auto;
   background: var(--bg-sunk);
 }
 .prose figure { margin: 1.5em 0; }
-.prose figcaption { font-size: 13px; color: var(--ink-4); text-align: center; margin-top: 0.6em; }
+.prose figcaption { font-family: var(--font-mono); font-size: 12px; color: var(--ink-4); text-align: center; margin-top: 0.6em; }
 .prose code {
   font-family: var(--font-mono);
   font-size: 0.86em;
   background: var(--code-bg);
-  border: 1px solid var(--line-soft);
+  border: 1px solid var(--line);
   padding: 0.1em 0.35em;
-  border-radius: var(--radius-mark);
 }
 .prose pre {
   position: relative;
@@ -567,28 +622,24 @@
   font-size: 13px;
   line-height: 1.65;
   background: var(--code-bg);
-  border: 0;
-  box-shadow: var(--shadow-inset-sm);
-  border-radius: var(--radius-tile);
+  border: 1px solid var(--line-strong);
   padding: 0.9em 1em;
   overflow-x: auto;
 }
 .prose pre code { background: none; border: 0; padding: 0; font-size: inherit; }
 /* Code blocks in article bodies get a head with the language and a copy button (features/item/ArticleBody). */
-.prose .code-block { margin-top: 1.2em; border-radius: var(--radius-tile); overflow: hidden; background: var(--code-bg); box-shadow: var(--shadow-inset-sm); }
-.prose .code-block pre { margin: 0; border: 0; border-radius: 0; box-shadow: none; }
-.prose .code-block-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 8px 6px 14px; border-bottom: 1px solid var(--line-soft); font-size: 12px; line-height: 1.4; color: var(--ink-4); letter-spacing: 0; }
-.prose .code-block-copy { display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border: 0; border-radius: 9999px; background: var(--surface); box-shadow: var(--shadow-thumb); color: var(--ink-3); font-size: 12px; transition: color 120ms, box-shadow 160ms; }
-.prose .code-block-copy:hover { color: var(--accent); }
-.prose .code-block-copy:active { box-shadow: var(--shadow-inset-sm); }
-.prose .code-block-copy[data-status="copied"] { color: var(--ok-ink); }
+.prose .code-block { margin-top: 1.2em; overflow: hidden; background: var(--code-bg); border: 1px solid var(--line-strong); }
+.prose .code-block pre { margin: 0; border: 0; }
+.prose .code-block-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 4px 4px 4px 12px; background: var(--mass); color: var(--on-mass); font-family: var(--font-mono); font-size: 11px; line-height: 1.4; letter-spacing: 0.08em; text-transform: uppercase; }
+.prose .code-block-copy { display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border: 1px solid var(--on-mass); background: var(--mass); color: var(--on-mass); font-size: 11px; transition: color 120ms, background-color 120ms; }
+.prose .code-block-copy:hover { background: var(--on-mass); color: var(--mass); }
+.prose .code-block-copy[data-status="copied"] { background: var(--signal); border-color: var(--signal); color: var(--on-signal); }
+/* Code is set in one ink: comments recede, strings and numbers take the signal ink, keywords are bold. */
 .prose .hljs-comment, .prose .hljs-quote { color: var(--ink-4); font-style: italic; }
-.prose .hljs-keyword, .prose .hljs-selector-tag, .prose .hljs-doctag, .prose .hljs-name { color: var(--code-keyword); }
-.prose .hljs-string, .prose .hljs-regexp, .prose .hljs-link, .prose .hljs-attribute, .prose .hljs-addition { color: var(--code-string); }
-.prose .hljs-number, .prose .hljs-literal, .prose .hljs-symbol, .prose .hljs-bullet { color: var(--code-number); }
-.prose .hljs-title, .prose .hljs-section, .prose .hljs-type, .prose .hljs-built_in { color: var(--code-title); }
-.prose .hljs-variable, .prose .hljs-template-variable, .prose .hljs-params, .prose .hljs-attr { color: var(--code-variable); }
-.prose .hljs-meta, .prose .hljs-deletion { color: var(--code-meta); }
+.prose .hljs-keyword, .prose .hljs-selector-tag, .prose .hljs-doctag, .prose .hljs-name, .prose .hljs-title, .prose .hljs-section, .prose .hljs-type, .prose .hljs-built_in { color: var(--ink); font-weight: 700; }
+.prose .hljs-string, .prose .hljs-regexp, .prose .hljs-link, .prose .hljs-attribute, .prose .hljs-addition, .prose .hljs-number, .prose .hljs-literal, .prose .hljs-symbol, .prose .hljs-bullet { color: var(--accent); }
+.prose .hljs-variable, .prose .hljs-template-variable, .prose .hljs-params, .prose .hljs-attr { color: var(--ink-2); }
+.prose .hljs-meta, .prose .hljs-deletion { color: var(--hot); }
 .prose img.zoomable { cursor: zoom-in; }
 /* Wide tables scroll sideways instead of squeezing their cells to a character a line (body text may
    break anywhere; cells break between words, and keep room for a short word or number). */
@@ -602,7 +653,7 @@
   line-height: 1.55;
 }
 .prose th, .prose td { border: 1px solid var(--line); padding: 0.5em 0.75em; text-align: left; min-width: 4.5em; overflow-wrap: break-word; }
-.prose th { background: var(--bg-sunk); font-weight: 600; }
+.prose th { background: var(--mass); color: var(--on-mass); font-weight: 600; border-color: var(--mass); }
 .prose hr { border: 0; border-top: 1px solid var(--line); margin: 2em 0; }
 
 /* Policy pages read smaller and quieter than article bodies, with numbered sections set apart. */
@@ -632,10 +683,4 @@
   color: var(--ink);
   font-weight: 600;
   white-space: nowrap;
-}
-
-/* Report pages read on a faintly toned paper in the light theme, lighter than the site's page ground;
-   the archive column is halfway between the site sidebar and white. */
-:root:not([data-theme="dark"]) body:has(.report-shell) {
-  background: color-mix(in srgb, var(--bg) 60%, var(--surface));
 }

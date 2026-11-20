@@ -101,7 +101,7 @@ export default function StarredPage() {
       <PhoneBar back={{ to: "/more", label: "マイページ" }} title="お気に入り" />
       <header className="flex flex-col gap-2 pb-4 pt-3 sm:flex-row sm:items-start sm:justify-between lg:pt-1">
         <div>
-          <h1 data-page-title="" className="text-[24px] font-semibold leading-[1.3] text-ink">お気に入り</h1>
+          <h1 data-page-title="" className="t-display text-[28px] leading-[1.15] text-ink lg:text-[34px]">お気に入り</h1>
           <p className="mt-1.5 text-[13px] text-ink-3">{`この端末でお気に入りにした ${SITE.name} の内容。あとで読む・見返すのに便利です。`}</p>
         </div>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 sm:pt-1.5">
@@ -121,11 +121,11 @@ export default function StarredPage() {
           <input ref={fileRef} type="file" accept="application/json,.json" className="sr-only" onChange={(e) => doImport(e.target.files?.[0])} />
         </div>
       </header>
-      <p className="rounded-tile border border-line bg-surface px-4 py-2.5 text-[12.5px] text-ink-3">お気に入りはこのブラウザにだけ保存され、ブラウザのデータを消したり端末を変えたりすると引き継がれません。</p>
+      <p className="border border-line bg-surface px-4 py-2.5 text-[12.5px] text-ink-3">お気に入りはこのブラウザにだけ保存され、ブラウザのデータを消したり端末を変えたりすると引き継がれません。</p>
       <Presence show={!!notice} enter="anim-notice-in" exit="anim-fade-out" duration={160}>
         <div
           role="status"
-          className={`mt-3 flex items-start justify-between gap-3 rounded-tile px-4 py-2.5 text-[13px] ${notice?.kind === "ok" ? "bg-accent-soft text-accent-ink dark:text-accent" : "bg-hot-soft text-hot"}`}
+          className={`mt-3 flex items-start justify-between gap-3 px-4 py-2.5 text-[13px] ${notice?.kind === "ok" ? "border border-accent text-accent" : "border border-hot text-hot"}`}
         >
           {notice?.text}
           <button type="button" aria-label="閉じる" onClick={() => setNotice(null)} className="shrink-0 opacity-70 hover:opacity-100">
@@ -134,7 +134,7 @@ export default function StarredPage() {
         </div>
       </Presence>
       {!mounted ? null : starred.length === 0 ? (
-        <div className="mt-3 flex flex-col items-center rounded-card border border-dashed border-line-strong px-6 py-12 text-center">
+        <div className="mt-3 flex flex-col items-center border border-dashed border-line-strong px-6 py-12 text-center">
           <IconBookmark size={20} className="text-ink-4" />
           <p className="mt-3 text-[13px] text-ink-3">お気に入りはまだありません。記事を開いて、詳細ページでお気に入りをタップすると追加できます。</p>
           <Link to="/" className="mt-4 text-[12.5px] font-medium text-accent hover:text-accent-ink">
@@ -155,7 +155,7 @@ export default function StarredPage() {
                   <span className="ml-auto hidden shrink-0 sm:inline">
                     <span className="num">{fullDateTime(s.savedAt)}</span> に追加
                   </span>
-                  <button type="button" aria-label="お気に入りから外す" title="お気に入りから外す" onClick={() => removeStar(s.id)} className="relative z-10 -my-1 ml-auto grid size-7 shrink-0 place-items-center rounded-full text-ink-4 transition-colors hover:bg-bg-sunk hover:text-ink sm:ml-0">
+                  <button type="button" aria-label="お気に入りから外す" title="お気に入りから外す" onClick={() => removeStar(s.id)} className="relative z-10 -my-1 ml-auto grid size-7 shrink-0 place-items-center text-ink-4 transition-colors hover:bg-bg-sunk hover:text-ink sm:ml-0">
                     <IconClose size={14} />
                   </button>
                 </div>
@@ -170,7 +170,7 @@ export default function StarredPage() {
                 </h2>
                 {s.summary && <p className="mt-1.5 line-clamp-2 text-[14px] leading-[1.75] text-ink-3">{s.summary}</p>}
                 {unavailable && <p className="mt-2 text-[12.5px] text-hot">この内容は公開を終了しました。お気に入りは手動で外すまで残ります。</p>}
-                {status === "summary-only" && <p className="mt-2 text-[12.5px] text-amber-ink">情報源の要望により、この内容はいま要約だけを表示しています。</p>}
+                {status === "summary-only" && <p className="mt-2 text-[12.5px] text-amber">情報源の要望により、この内容はいま要約だけを表示しています。</p>}
               </li>
             );
           })}

@@ -50,7 +50,7 @@ function RowLink({ row, dot = false }: { row: Row; dot?: boolean }) {
         <span className="text-ink-3">{row.icon}</span>
         <span className="flex flex-1 items-center gap-2">
           {row.label}
-          {dot && <span className="size-[7px] rounded-full bg-hot" aria-label="新しい更新があります" />}
+          {dot && <span className="size-2 border border-mass bg-signal" aria-label="新しい更新があります" />}
         </span>
         {row.detail && <span className="text-[14px] font-normal text-ink-4">{row.detail}</span>}
         <IconChevronRight size={16} className="text-ink-4" />
@@ -69,7 +69,7 @@ export default function MorePage() {
   return (
     <div className="mx-auto max-w-[var(--page-max-reading)] pb-8">
       <PhoneBar title="マイページ" large />
-      <h1 className="hidden pb-4 pt-1 text-[22px] font-bold text-ink lg:block">マイページ</h1>
+      <h1 className="t-display hidden pb-4 pt-1 text-[30px] text-ink lg:block">マイページ</h1>
       <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-4 2xl:grid-cols-3">
         <Group>
           <RowLink row={{ to: "/starred", label: "お気に入り", icon: <IconBookmark size={20} />, detail: here && starred.length > 0 ? <span className="num">{starred.length}</span> : undefined }} />

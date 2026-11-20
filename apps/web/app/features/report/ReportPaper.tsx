@@ -2,9 +2,10 @@
 // beside it for the issue and date), a band of the issue's figures, the front page (the lead, today's
 // highlights and the page index), then one page per section in two columns, the neighbouring issues
 // and a colophon. Colours, type and components are the site's; only the structure is a paper's.
-// Rules are hairlines in two weights: line-strong closes the masthead and underlines a page's heading
-// and the neighbours; line parts stories, columns and list rows. Nothing is set in solid ink. Stories
-// sit in rows of two whose rules run across the page, each story as tall as its neighbour.
+// The masthead is the one heavy plate: mass rules above and below, the survey map under the nameplate and a
+// set of 45° bands behind the ear. Below it rules are hairlines in two weights: line-strong underlines a
+// page's heading and the neighbours; line parts stories, columns and list rows. Stories sit in rows of
+// two whose rules run across the page, each story as tall as its neighbour.
 import { useState, type ReactNode } from "react";
 import { Link } from "react-router";
 import type { ReportCitation, ReportDetail, ReportNavigationEntry } from "@hotmoto/contracts/site";
@@ -14,6 +15,7 @@ import { IconArrowLeft, IconArrowRight, IconArrowUpRight } from "../../component
 import { Kicker } from "../../components/ui/Kicker";
 import type { OutlineEntry } from "../../components/ui/OutlineSheet";
 import { SourceAvatar } from "../../components/ui/SourceAvatar";
+import { Drawing, ShearBands } from "../../components/ui/Graphic";
 import { Halftone } from "./Halftone";
 import { Nameplate } from "./Nameplate";
 import { IssueDots } from "./IssueDots";
@@ -33,44 +35,51 @@ function Masthead({ report, index }: { report: ReportDetail; index: ReportNaviga
   return (
     <header className="pt-5 lg:pt-0">
       <div className="flex items-center justify-between gap-4 text-[12px] text-ink-4">
-        <span className="num">{dateLine(report.kind, report.key)}</span>
+        <span className="t-data">{dateLine(report.kind, report.key)}</span>
         <span className="hidden tracking-[0.3em] @[640px]:inline">{MOTTO[report.kind]}</span>
         <span>{EDITION[report.kind]}</span>
       </div>
 
-      <div className="flex items-stretch justify-between gap-5 py-6 @[880px]:gap-10 @[880px]:py-8">
-        <div className="flex min-w-0 flex-col justify-center">
-          <h1 id="report-start" className="scroll-mt-[calc(var(--bar-h)+1.5rem)]">
-            <span className="sr-only">
-              {before(withSubject(label), label)}{label} · {dateLine(report.kind, report.key)}
-            </span>
-            <Nameplate which={report.kind} className="block h-[44px] w-auto @[520px]:h-[58px] @[880px]:h-[74px] @[1040px]:h-[84px]" />
-          </h1>
-          <p className="mt-3 text-[11.5px] tracking-[0.36em] text-ink-4 @[880px]:mt-4 @[880px]:text-[12.5px]">{REPORTS.imprint}</p>
-        </div>
-        {/* The ear: the box beside the nameplate, as a daily paper sets it: the issue and the date in the
-            nameplate's dots, and on wider paper the issue calendar beside them. */}
-        <div className="flex shrink-0 items-stretch well rounded-panel">
-          <div className="flex w-[112px] flex-col items-center justify-center px-2 py-3 text-center @[880px]:w-[150px] @[880px]:py-4">
-            <span className="text-[11px] tracking-[0.2em] text-ink-4">第 {report.issueNumber} 号</span>
-            <Halftone seed={`${report.kind}-${report.key}-date`} className="num mt-2 whitespace-nowrap text-[44px] font-black leading-[0.95] tracking-[-0.04em] text-ink @[880px]:text-[64px]">
-              {mark.figure}
-            </Halftone>
-            <span className="mt-2 text-[11.5px] text-ink-2">{mark.top}</span>
-            <span className="text-[11.5px] text-ink-4">{mark.bottom}</span>
+      {/* The masthead plate: contours under the nameplate and one set of 45° bands running behind the ear. */}
+      <div className="relative mt-3 overflow-hidden border-y-2 border-mass bg-bg">
+        <Drawing of="map" fit="cover" at="70% 60%" tone="line" className="absolute inset-0" />
+        <ShearBands at={0.74} wide={120} className="hidden @[560px]:block" />
+        <div className="relative flex items-stretch justify-between gap-5 py-6 @[880px]:gap-10 @[880px]:py-8">
+          <div className="flex min-w-0 flex-col justify-center">
+            <h1 id="report-start" className="w-fit scroll-mt-[calc(var(--bar-h)+1.5rem)] bg-bg pr-3">
+              <span className="sr-only">
+                {before(withSubject(label), label)}{label} · {dateLine(report.kind, report.key)}
+              </span>
+              <Nameplate which={report.kind} className="block h-[44px] w-auto @[520px]:h-[58px] @[880px]:h-[74px] @[1040px]:h-[84px]" />
+            </h1>
+            <p className="t-micro mt-3 w-fit bg-bg pr-2 text-[11px] tracking-[0.3em] text-ink-4 @[880px]:mt-4">
+              {REPORTS.imprint} · NO.{pad(report.issueNumber)}
+            </p>
           </div>
-          <IssueDots kind={report.kind} reportKey={report.key} issueNumber={report.issueNumber} index={index} className="hidden w-[176px] border-l border-line px-4 py-4 @[760px]:block @[880px]:w-[196px]" />
+          {/* The ear: the box beside the nameplate, as a daily paper sets it: the issue and the date in the
+              nameplate's dots, and on wider paper the issue calendar beside them. */}
+          <div className="relative flex shrink-0 items-stretch border-2 border-mass bg-bg">
+            <div className="flex w-[112px] flex-col items-center justify-center px-2 py-3 text-center @[880px]:w-[150px] @[880px]:py-4">
+              <span className="t-label mass-face px-2 py-0.5 text-[10.5px] tracking-[0.16em]">第 {report.issueNumber} 号</span>
+              <Halftone seed={`${report.kind}-${report.key}-date`} className="t-display mt-2 whitespace-nowrap text-[44px] leading-[0.95] text-ink @[880px]:text-[60px]">
+                {mark.figure}
+              </Halftone>
+              <span className="mt-2 text-[11.5px] text-ink-2">{mark.top}</span>
+              <span className="text-[11.5px] text-ink-4">{mark.bottom}</span>
+            </div>
+            <IssueDots kind={report.kind} reportKey={report.key} issueNumber={report.issueNumber} index={index} className="hidden w-[176px] border-l border-line px-4 py-4 @[760px]:block @[880px]:w-[196px]" />
+          </div>
         </div>
       </div>
 
-      <div className="flex flex-wrap items-baseline gap-x-8 gap-y-1.5 border-y border-line-strong py-3">
+      <div className="flex flex-wrap items-baseline gap-x-8 gap-y-1.5 border-b border-line-strong bg-bg-sunk px-3 py-3">
         {metricItems(report.metrics).map((m) => (
           <span key={m.unit} className="inline-flex items-baseline gap-1.5 whitespace-nowrap">
-            <span className="num text-[22px] font-bold leading-none tracking-[-0.02em] text-ink @[880px]:text-[24px]">{m.value}</span>
+            <span className="t-display text-[22px] leading-none text-ink @[880px]:text-[24px]">{m.value}</span>
             <span className="text-[12px] text-ink-4">{m.unit}</span>
           </span>
         ))}
-        <span className="ml-auto whitespace-nowrap text-[12px] text-ink-4">約 {report.readingMinutes} 分で読めます</span>
+        <span className="t-data ml-auto whitespace-nowrap text-[12px] text-ink-4">約 {report.readingMinutes} 分で読めます</span>
       </div>
     </header>
   );
@@ -108,7 +117,7 @@ function Related({ items, className = "" }: { items: ReportCitation[]; className
     <ul className={`space-y-1.5 ${className}`}>
       {items.slice(0, 4).map((r) => (
         <li key={keyOf(r)} className="flex gap-2.5 text-[13.5px] leading-[1.65]">
-          <span className="mt-[9px] size-1 shrink-0 rounded-full bg-ink-4" aria-hidden="true" />
+          <span className="mt-[9px] size-1 shrink-0 bg-ink-4" aria-hidden="true" />
           <span className="min-w-0 [overflow-wrap:anywhere]">
             {r.available && r.itemId ? (
               <Link viewTransition to={`/items/${r.itemId}`} prefetch="intent" className="text-ink-2 transition-colors hover:text-accent">
@@ -237,7 +246,7 @@ function LeadPicture({ cover, onError, priority = false, className = "" }: { cov
   const shown = ratio >= 1.25 ? Math.min(2, Math.max(1.6, ratio)) : Math.max(0.8, ratio);
   return (
     <figure className={className}>
-      <div className="overflow-hidden well rounded-panel" style={{ aspectRatio: shown }}>
+      <div className="overflow-hidden well" style={{ aspectRatio: shown }}>
         <img src={cover.url} srcSet={cover.srcSet}
           sizes={priority ? "(min-width: 1700px) 780px, (min-width: 1580px) calc(100vw - 920px), (min-width: 1420px) calc(100vw - 880px), (min-width: 1024px) calc(100vw - 540px), (min-width: 640px) 608px, calc(100vw - 32px)" : "auto, (min-width: 1180px) 300px, (min-width: 640px) 608px, calc(100vw - 32px)"}
           width={cover.width ?? undefined} height={cover.height ?? undefined}
@@ -478,7 +487,7 @@ export function ReportPaper({ report, index }: { report: ReportDetail; index: Re
           <ul className={`${COLUMNS} @[1040px]:columns-3`}>
             {report.flashes.map((f, i) => (
               <li key={`${keyOf(f)}-${i}`} className="flex break-inside-avoid gap-2.5 border-b border-line py-3 text-[14.5px] leading-[1.65]">
-                <span className="mt-[9px] size-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true" />
+                <span className="mt-[9px] size-1.5 shrink-0 bg-accent" aria-hidden="true" />
                 <span className="min-w-0">
                   {!f.available ? (
                     <span className="text-ink-4">

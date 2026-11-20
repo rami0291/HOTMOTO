@@ -36,7 +36,7 @@ export function PhoneBar({ back, title, large = false, sub, leading, center, act
     <>
       <header
         data-phone-bar=""
-        className={`bleed sticky top-0 z-40 bg-bg/85 backdrop-blur-xl backdrop-saturate-150 transition-shadow duration-200 lg:hidden ${scrolled ? "shadow-[0_8px_16px_-10px_var(--neu-shade)]" : ""}`}
+        className={`bleed sticky top-0 z-40 border-b bg-bg transition-colors duration-200 lg:hidden ${scrolled ? "border-frame" : "border-transparent"}`}
       >
         <div className={`-mx-2.5 grid h-[var(--bar-h)] items-center ${wideCenter ? "grid-cols-[minmax(0,1fr)_auto]" : "grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]"}`}>
           {!wideCenter && <div className="flex min-w-0 items-center">{back ? <BackButton {...back} /> : leading}</div>}
@@ -57,7 +57,7 @@ export function PhoneBar({ back, title, large = false, sub, leading, center, act
       </header>
       {large && title && (
         <div className="pb-3 pt-0.5 lg:hidden">
-          <h1 data-page-title="" className="text-[30px] font-bold leading-[1.25] tracking-[-0.01em] text-ink">
+          <h1 data-page-title="" className="t-display text-[30px] leading-[1.15] text-ink">
             {title}
           </h1>
           {sub && <div className="mt-1 text-[12.5px] leading-relaxed text-ink-4">{sub}</div>}
@@ -85,7 +85,7 @@ function BackButton({ to, label }: BackTarget) {
         if (historyIndex() > 0) navigate(-1);
         else navigate(to, { viewTransition: true });
       }}
-      className="flex h-11 min-w-11 items-center pl-1 pr-2 text-[16px] text-accent transition-opacity active:opacity-50"
+      className="flex h-11 min-w-11 items-center pl-1 pr-2 text-[15px] font-semibold text-ink transition-opacity active:opacity-50"
     >
       <IconChevronLeft size={25} strokeWidth={2.1} />
       <span className="max-w-[7em] truncate">{text}</span>
@@ -93,7 +93,7 @@ function BackButton({ to, label }: BackTarget) {
   );
 }
 
-/** A 44px round icon button for the bar, drawn as a smaller raised disc that sinks when tapped; `on` tints it (a filter in use). */
+/** A 44px icon button for the bar, drawn as a smaller framed square that sinks when tapped; `on` inks its edge (a filter in use). */
 export const BarButton = forwardRef<HTMLButtonElement, ButtonHTMLAttributes<HTMLButtonElement> & { label: string; on?: boolean; children: ReactNode }>(function BarButton(
   { label, on = false, children, className = "", ...rest },
   ref,
@@ -104,7 +104,7 @@ export const BarButton = forwardRef<HTMLButtonElement, ButtonHTMLAttributes<HTML
       type="button"
       aria-label={label}
       title={label}
-      className={`relative isolate grid size-11 shrink-0 place-items-center rounded-full transition-colors duration-150 before:absolute before:inset-[5px] before:-z-10 before:rounded-full before:bg-surface before:shadow-[var(--shadow-thumb)] before:transition-shadow active:before:shadow-[var(--shadow-inset-sm)] ${on ? "text-accent" : "text-ink-2"} ${className}`}
+      className={`relative isolate grid size-11 shrink-0 place-items-center transition-colors duration-150 before:absolute before:inset-[6px] before:-z-10 before:border before:transition-colors active:before:bg-bg-sunk ${on ? "text-ink before:border-ink" : "text-ink-2 before:border-line-strong"} ${className}`}
       {...rest}
     >
       {children}

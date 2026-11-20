@@ -23,7 +23,7 @@ export function Steps({ children }: { children: ReactNode }) {
 export function Step({ n, title, children }: { n: number; title: string; children?: ReactNode }) {
   return (
     <li className="relative grid grid-cols-[28px_minmax(0,1fr)] gap-x-3.5 before:absolute before:bottom-[-26px] before:left-[13.5px] before:top-9 before:w-px before:bg-line last:before:hidden">
-      <span className="num grid size-7 place-items-center rounded-full bg-accent-soft text-[13px] font-semibold text-accent">{n}</span>
+      <span className="num grid size-7 place-items-center bg-accent-soft text-[13px] font-semibold text-accent">{n}</span>
       <div className="min-w-0 pt-[3px]">
         <h3 className="text-[15.5px] font-semibold leading-snug text-ink">{title}</h3>
         {children && <div className="mt-1.5 text-[14px] leading-[1.8] text-ink-2">{children}</div>}
@@ -45,7 +45,7 @@ export function Block({ title, id, children }: { title: string; id?: string; chi
 /** A question or instruction to paste into an Agent, with its copy button. */
 export function Ask({ text }: { text: string }) {
   return (
-    <div className="mt-2.5 flex items-center gap-3 rounded-tile border border-line bg-surface py-2 pl-3.5 pr-2">
+    <div className="mt-2.5 flex items-center gap-3 border border-line bg-surface py-2 pl-3.5 pr-2">
       <span className="min-w-0 flex-1 text-[14px] font-medium leading-snug text-ink">{text}</span>
       <CopyButton text={text} className="shrink-0" />
     </div>
@@ -55,7 +55,7 @@ export function Ask({ text }: { text: string }) {
 /** One address to copy: the MCP server, a feed. */
 export function Address({ url, label = "コピー" }: { url: string; label?: string }) {
   return (
-    <div className="mt-2.5 flex items-center gap-2 rounded-tile border border-line bg-surface py-2 pl-3.5 pr-2">
+    <div className="mt-2.5 flex items-center gap-2 border border-line bg-surface py-2 pl-3.5 pr-2">
       <code className="mono min-w-0 flex-1 truncate text-[12.5px] text-ink">{url}</code>
       <CopyButton text={url} label={label} className="shrink-0" />
     </div>
@@ -67,7 +67,7 @@ export function Tips({ items }: { items: Array<{ title: string; text: ReactNode 
   return (
     <ol className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
       {items.map((t, i) => (
-        <li key={t.title} className="well rounded-panel p-4">
+        <li key={t.title} className="well p-4">
           <div className="mono text-[11px] text-ink-4">0{i + 1}</div>
           <div className="mt-1 text-[14.5px] font-semibold text-ink">{t.title}</div>
           <p className="mt-1 text-[13px] leading-[1.7] text-ink-3">{t.text}</p>
@@ -79,13 +79,13 @@ export function Tips({ items }: { items: Array<{ title: string; text: ReactNode 
 
 /** A note in the accent or amber wash: an upgrade to make, a deadline. */
 export function Callout({ tone = "accent", title, children, action }: { tone?: "accent" | "amber"; title: ReactNode; children: ReactNode; action?: ReactNode }) {
-  const wash = tone === "amber" ? "border-amber/30 bg-amber-soft" : "border-accent/20 bg-accent-softer";
+  const wash = tone === "amber" ? "border-amber/30 bg-amber-soft" : "border-accent/20 bg-bg-sunk";
   const dot = tone === "amber" ? "bg-amber" : "bg-accent";
   return (
-    <div className={`rounded-card border px-4 py-3.5 sm:px-5 ${wash}`}>
+    <div className={`border px-4 py-3.5 sm:px-5 ${wash}`}>
       <div className="flex flex-col gap-2.5 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex min-w-0 gap-2.5">
-          <span className={`mt-[9px] size-1.5 shrink-0 rounded-full ${dot}`} aria-hidden="true" />
+          <span className={`mt-[9px] size-1.5 shrink-0 ${dot}`} aria-hidden="true" />
           <div className="min-w-0 text-[13.5px] leading-[1.75] text-ink-2">
             <div className="font-semibold text-ink">{title}</div>
             <div className="mt-0.5">{children}</div>
@@ -119,7 +119,7 @@ export function Bullets({ items }: { items: ReactNode[] }) {
     <ul className="space-y-1.5">
       {items.map((it, i) => (
         <li key={i} className="flex gap-2.5">
-          <span className="mt-[11px] size-1 shrink-0 rounded-full bg-ink-4" aria-hidden="true" />
+          <span className="mt-[11px] size-1 shrink-0 bg-ink-4" aria-hidden="true" />
           <span className="min-w-0">{it}</span>
         </li>
       ))}
@@ -128,13 +128,13 @@ export function Bullets({ items }: { items: ReactNode[] }) {
 }
 
 export function Mono({ children }: { children: ReactNode }) {
-  return <code className="mono rounded-mark bg-bg-sunk px-1.5 py-0.5 text-[0.88em] text-ink">{children}</code>;
+  return <code className="mono bg-bg-sunk px-1.5 py-0.5 text-[0.88em] text-ink">{children}</code>;
 }
 
 /** A plain table on a card; long rows scroll sideways on phones. Group rows name a block of rows. */
 export function Table({ head, rows, minWidth = 560 }: { head: string[]; rows: Array<{ group: string } | ReactNode[]>; minWidth?: number }) {
   return (
-    <div className="overflow-x-auto rounded-card border border-line bg-surface">
+    <div className="overflow-x-auto border border-line bg-surface">
       <table className="w-full text-left text-[13.5px]" style={{ minWidth }}>
         <thead className="bg-bg-sunk text-[12.5px] text-ink-3">
           <tr>{head.map((h) => <th key={h} className="px-3.5 py-2 font-medium">{h}</th>)}</tr>

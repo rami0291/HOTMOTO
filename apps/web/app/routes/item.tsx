@@ -94,7 +94,7 @@ function ReadingProgress() {
       window.removeEventListener("resize", schedule);
     };
   }, []);
-  return <div ref={ref} aria-hidden="true" className="fixed inset-x-0 top-0 z-50 h-[2px] origin-left scale-x-0 bg-accent transition-transform duration-150 ease-out" />;
+  return <div ref={ref} aria-hidden="true" className="fixed inset-x-0 top-0 z-50 h-[3px] origin-left scale-x-0 border-b border-mass bg-signal transition-transform duration-150 ease-out" />;
 }
 
 /** An outline link: a plain click scrolls in place (above); modifier clicks keep the browser's behaviour. */
@@ -146,7 +146,7 @@ function useToast(): [string | null, (text: string) => void] {
 function Toast({ text }: { text: string | null }) {
   if (!text) return null;
   return (
-    <div role="status" className="fixed bottom-[calc(80px+env(safe-area-inset-bottom))] left-1/2 z-50 -translate-x-1/2 rounded-full bg-ink px-4 py-2 text-[13px] text-bg shadow-[var(--shadow-pop)] lg:bottom-8">
+    <div role="status" className="fixed bottom-[calc(80px+env(safe-area-inset-bottom))] left-1/2 z-50 -translate-x-1/2 bg-ink px-4 py-2 text-[13px] text-bg lg:bottom-8">
       {text}
     </div>
   );
@@ -190,7 +190,7 @@ function ItemPreview({ preview }: { preview: FeedItemSummary }) {
         {!isX && <h1 data-page-title="" className="text-[26px] font-bold leading-[1.38] tracking-[-0.01em] text-ink">{preview.title}</h1>}
         {preview.summary && (
           <section className={isX ? "mt-4" : "mt-7"}>
-            <div className="mb-2 text-[12px] font-semibold text-accent">AI のガイド</div>
+            <div className="t-label mb-2.5 flex items-center gap-2 text-[11px] text-accent"><span className="hatch h-2.5 w-5" aria-hidden="true" />AI のガイド</div>
             <p className="text-[18px] leading-[1.7] text-ink">{preview.summary}</p>
           </section>
         )}
@@ -230,7 +230,7 @@ function ItemGone() {
         <div className="text-[20px] font-bold text-ink">{gone ? "ここには何もありません" : "いまは読み込めません"}</div>
         <p className="mt-2 text-[13.5px] leading-relaxed text-ink-3">{gone ? "この内容は存在しないか、公開を終了しました。" : "サービスが混み合っています。しばらくしてからもう一度お試しください。"}</p>
         {!gone && (
-          <button type="button" onClick={() => void revalidator.revalidate()} className="mt-6 h-11 rounded-full border border-line-strong bg-surface px-5 text-[14px] font-medium text-ink-2 active:bg-bg-sunk">
+          <button type="button" onClick={() => void revalidator.revalidate()} className="plate mt-6 h-11 px-5 text-[14px] font-medium text-ink-2">
             再試行
           </button>
         )}
@@ -294,7 +294,7 @@ function ItemView({ item }: { item: SiteItemDetail }) {
     else navigate(item.selected ? "/" : "/all");
   };
   const backButton = (
-    <button type="button" onClick={back} className="-ml-1.5 inline-flex h-8 items-center gap-1.5 rounded-full px-1.5 text-[13px] text-ink-3 transition-colors hover:text-ink">
+    <button type="button" onClick={back} className="-ml-1.5 inline-flex h-8 items-center gap-1.5 px-1.5 text-[13px] text-ink-3 transition-colors hover:text-ink">
       <IconArrowLeft size={16} /> 戻る
     </button>
   );
@@ -334,7 +334,7 @@ function ItemView({ item }: { item: SiteItemDetail }) {
         href={item.links.original}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex h-8 flex-1 items-center justify-center gap-1.5 rounded-full border border-line-strong bg-surface px-3.5 text-[12.5px] font-medium text-ink-2 transition-colors hover:border-ink-4 hover:text-ink"
+        className="plate inline-flex h-8 flex-1 items-center justify-center gap-1.5 px-3.5 text-[12.5px] font-medium text-ink-2 hover:text-ink"
       >
         {originalLabel} <IconExternal size={13} />
       </a>
@@ -372,7 +372,7 @@ function ItemView({ item }: { item: SiteItemDetail }) {
         <ol className="-ml-px space-y-0.5 border-l border-line">
           {item.outline.map((o) => (
             <li key={o.id}>
-              <a href={`#${o.id}`} onClick={(e) => jumpTo(e, o.id)} className={`-ml-px block border-l border-transparent py-1 text-[12.5px] leading-snug text-ink-3 transition-colors hover:border-accent hover:text-ink ${o.level > 2 ? "pl-5" : "pl-3"}`}>
+              <a href={`#${o.id}`} onClick={(e) => jumpTo(e, o.id)} className={`-ml-px block border-l border-transparent py-1 text-[12.5px] leading-snug text-ink-3 transition-colors hover:border-ink hover:text-ink ${o.level > 2 ? "pl-5" : "pl-3"}`}>
                 {o.text}
               </a>
             </li>
@@ -449,7 +449,7 @@ function ItemView({ item }: { item: SiteItemDetail }) {
         }
       >
         {/* Between lg and 2xl the left rail is hidden: 戻る stays at the top while reading, as on the original site. */}
-        <div className="sticky top-0 z-20 -mx-2 hidden bg-bg/95 px-2 py-1.5 backdrop-blur lg:block 2xl:hidden">{backButton}</div>
+        <div className="sticky top-0 z-20 -mx-2 hidden bg-bg px-2 py-1.5 lg:block 2xl:hidden">{backButton}</div>
         <article className="pb-6 pt-3 lg:pt-2 2xl:pt-1">
           <div className={`flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[13px] text-ink-3 2xl:hidden ${isX ? "" : "mb-3"}`}>
             <span className="font-semibold text-ink-2">{isX ? item.x!.authorName : item.source.name}</span>
@@ -470,12 +470,16 @@ function ItemView({ item }: { item: SiteItemDetail }) {
               </span>
             )}
           </div>
+          <div className="mb-3 flex items-center gap-3 text-ink-4" aria-hidden="true">
+            <span className="t-micro shrink-0">DOC HM-{item.id.slice(0, 8).toUpperCase()}</span>
+            <span className="ruler min-w-8 flex-1 text-line" />
+          </div>
           {!isX && <h1 data-page-title="" className="text-[26px] font-bold leading-[1.38] tracking-[-0.01em] text-ink lg:text-[32px] lg:leading-[1.34] xl:text-[36px] xl:leading-[1.3]">{item.title}</h1>}
           {!isX && item.originalTitle && <p className="mt-2.5 text-[14px] leading-relaxed text-ink-4">{item.originalTitle}</p>}
 
           {item.summary && (
             <section className={isX ? "mt-4" : "mt-7 xl:mt-8"}>
-              <div className="mb-2 text-[12px] font-semibold text-accent">{summaryOnly ? "要約" : "AI のガイド"}</div>
+              <div className="t-label mb-2.5 flex items-center gap-2 text-[11px] text-accent"><span className="hatch h-2.5 w-5" aria-hidden="true" />{summaryOnly ? "要約" : "AI のガイド"}</div>
               <p className="text-[18px] leading-[1.7] text-ink xl:text-[20px] xl:leading-[1.7]">{item.summary}</p>
             </section>
           )}
@@ -503,7 +507,7 @@ function ItemView({ item }: { item: SiteItemDetail }) {
             </div>
           )}
 
-          {summaryOnly && <p className="mt-7 rounded-control bg-bg-sunk px-4 py-3 text-[13.5px] leading-relaxed text-ink-3">情報源の要望により、ここでは要約と原文への入口だけを表示しています。全文は原文でお読みください。</p>}
+          {summaryOnly && <p className="mt-7 bg-bg-sunk px-4 py-3 text-[13.5px] leading-relaxed text-ink-3">情報源の要望により、ここでは要約と原文への入口だけを表示しています。全文は原文でお読みください。</p>}
 
           {item.body && bodyHtml && (
             <section className="mt-9 border-t border-line pt-4 xl:mt-10">
@@ -523,7 +527,7 @@ function ItemView({ item }: { item: SiteItemDetail }) {
                 )}
               </div>
               {hasTranslation && lang === "zh" && !item.body.complete && (
-                <p className="mb-5 rounded-control bg-bg-sunk px-3 py-2 text-[13px] text-ink-3">訳文はまだ完全ではありません。全文は原文に切り替えてお読みください。</p>
+                <p className="mb-5 bg-bg-sunk px-3 py-2 text-[13px] text-ink-3">訳文はまだ完全ではありません。全文は原文に切り替えてお読みください。</p>
               )}
               <ArticleBody html={bodyHtml} />
             </section>

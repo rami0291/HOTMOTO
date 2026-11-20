@@ -40,7 +40,7 @@ function useReadingDown(): boolean {
 }
 
 function Tool({ icon, label, onClick, href, pressed }: { icon: ReactNode; label: string; onClick?: () => void; href?: string; pressed?: boolean }) {
-  const cls = `flex flex-col items-center justify-center gap-[1px] rounded-tile text-[10.5px] transition-[box-shadow,color] duration-200 active:shadow-[var(--shadow-inset-sm)] disabled:opacity-40 ${pressed ? "neu-inset font-semibold text-accent" : "text-ink-3"}`;
+  const cls = `flex flex-col items-center justify-center gap-[1px] text-[10.5px] transition-[box-shadow,color] duration-200 disabled:opacity-40 ${pressed ? "sunk font-semibold text-accent" : "text-ink-3"}`;
   return href ? (
     <a href={href} target="_blank" rel="noopener noreferrer" className={cls}>
       {icon}
@@ -71,7 +71,7 @@ export function ReaderToolbar({ item, originalUrl, originalLabel, onOutline, onS
       className={`pointer-events-none fixed inset-x-0 bottom-0 z-40 px-[max(10px,env(safe-area-inset-left))] pb-[max(8px,env(safe-area-inset-bottom))] transition-transform duration-300 ease-[var(--ease-out-quart)] lg:hidden ${hidden ? "translate-y-[calc(100%+12px)]" : ""}`}
     >
       {/* The same floating pill as the tab bar. */}
-      <div className={`pointer-events-auto mx-auto grid h-[58px] max-w-[620px] gap-1 rounded-sheet border border-edge bg-surface/92 p-1.5 shadow-[var(--shadow-card)] backdrop-blur-xl backdrop-saturate-150 ${onOutline ? "grid-cols-4" : "grid-cols-3"}`}>
+      <div className={`pointer-events-auto mx-auto grid h-[58px] max-w-[620px] gap-1 border border-frame bg-surface p-1.5 ${onOutline ? "grid-cols-4" : "grid-cols-3"}`}>
         <Tool
           pressed={star.on}
           onClick={star.toggle}
@@ -101,7 +101,7 @@ export interface ActionRow {
 
 /** The article's further actions as a sheet of rows (phones; desktop keeps its menu). */
 export function ActionsSheet({ open, onClose, rows }: { open: boolean; onClose: () => void; rows: ActionRow[] }) {
-  const row = "flex h-[52px] w-full items-center gap-3.5 rounded-tile px-3 text-left text-[16px] text-ink transition-colors active:bg-bg-sunk";
+  const row = "flex h-[52px] w-full items-center gap-3.5 px-3 text-left text-[16px] text-ink transition-colors active:bg-bg-sunk";
   return (
     <Sheet open={open} onClose={onClose} label="その他の操作">
       <ul className="px-2 pt-2">

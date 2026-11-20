@@ -133,17 +133,18 @@ export function Sheet({ open, onClose, title, children, label, centered = false 
           aria-labelledby={title ? titleId : undefined}
           aria-label={title ? undefined : label}
           tabIndex={-1}
-          className={`sheet-panel anim-sheet-in relative mx-auto flex max-h-[88dvh] w-full max-w-[640px] flex-col rounded-t-sheet bg-surface shadow-[0_-12px_40px_var(--neu-shade)] outline-none ${centered ? "sm:w-auto sm:min-w-[400px] sm:rounded-sheet sm:pb-2" : ""}`}
+          className={`sheet-panel anim-sheet-in relative mx-auto flex max-h-[88dvh] w-full max-w-[640px] flex-col border-t-2 border-mass bg-surface outline-none sm:border-2 ${centered ? "sm:w-auto sm:min-w-[400px] sm:pb-2" : ""}`}
         >
           <div ref={handle} className="touch-none select-none">
-            <span aria-hidden="true" className={`mx-auto mt-[7px] block h-[5px] w-9 rounded-full bg-line-strong ${centered ? "sm:invisible" : ""}`} />
+            <span aria-hidden="true" className={`mx-auto mt-[7px] block h-[5px] w-9 bg-line-strong ${centered ? "sm:invisible" : ""}`} />
             {title && (
               <div className="flex min-h-12 items-center gap-3 pl-5 pr-2">
                 <h2 id={titleId} className="min-w-0 flex-1 text-[17px] font-bold leading-snug text-ink">
+            <span className="hatch mr-2.5 inline-block h-3 w-5 align-[-1px]" aria-hidden="true" />
                   {title}
                 </h2>
-                <button type="button" aria-label="閉じる" onClick={onClose} className="grid size-11 shrink-0 place-items-center rounded-full text-ink-3">
-                  <span className="grid size-[30px] place-items-center rounded-full bg-bg-sunk dark:bg-bg-muted">
+                <button type="button" aria-label="閉じる" onClick={onClose} className="grid size-11 shrink-0 place-items-center text-ink-3">
+                  <span className="grid size-[30px] place-items-center border border-line-strong">
                     <IconClose size={15} strokeWidth={2} />
                   </span>
                 </button>

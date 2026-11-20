@@ -50,7 +50,7 @@ function ReleaseBody({ lines }: { lines: string[] }) {
       <ul key={i} className={`${text} space-y-1`}>
         {b.map((li, j) => (
           <li key={j} className="flex gap-2">
-            <span className="mt-[11px] size-1 shrink-0 rounded-full bg-ink-4" aria-hidden="true" />
+            <span className="mt-[11px] size-1 shrink-0 bg-ink-4" aria-hidden="true" />
             <span>
               <Inline text={li} />
             </span>
@@ -80,18 +80,18 @@ function Day({ date, releases, id }: { date: string; releases: Release[]; id?: s
         {releases.map((r) => (
           <li
             key={`${r.date}-${r.time}-${r.title}`}
-            className={`grid gap-x-8 gap-y-2 border-b border-line-soft py-5 last:border-b-0 sm:grid-cols-[88px_minmax(0,1fr)] ${r.urgent ? "-mx-5 border-l-4 border-l-hot bg-hot-soft pl-4 pr-5 lg:-mx-7 lg:pl-6 lg:pr-7" : ""}`}
+            className={`grid gap-x-8 gap-y-2 border-b border-line-soft py-5 last:border-b-0 sm:grid-cols-[88px_minmax(0,1fr)] ${r.urgent ? "-mx-5 border-y-2 border-mass bg-bg-sunk px-5 lg:-mx-7 lg:px-7" : ""}`}
           >
             <div className="flex items-center gap-3 sm:block">
-              <span className="mono block text-[12.5px] text-ink-3">{r.time}</span>
+              <span className="t-data block text-[12px] text-ink-3">{r.time}</span>
               <span className="inline-flex items-center gap-1.5 text-[11.5px] text-ink-4 sm:mt-1.5">
-                <span className={`size-1.5 rounded-full ${r.urgent ? "bg-hot" : KIND_DOT[r.kind]}`} aria-hidden="true" />
+                <span className={`size-1.5 ${r.urgent ? "border border-mass bg-signal" : KIND_DOT[r.kind]}`} aria-hidden="true" />
                 {r.kind}
               </span>
             </div>
-            <article className={`min-w-0 sm:border-l sm:pl-8 ${r.urgent ? "sm:border-hot/40" : "sm:border-line"}`}>
-              {r.urgent && <span className="mb-2 inline-flex rounded-full bg-hot px-2.5 py-0.5 text-[12px] font-semibold text-white">重要</span>}
-              <h3 className={`text-[15px] font-bold leading-snug ${r.urgent ? "text-hot" : "text-ink"}`}>{r.title}</h3>
+            <article className={`min-w-0 sm:border-l sm:pl-8 ${r.urgent ? "sm:border-mass" : "sm:border-line"}`}>
+              {r.urgent && <span className="hatch mb-2 inline-flex"><span className="ml-6 bg-mass px-2 py-0.5 text-[12px] font-semibold text-on-mass">重要</span></span>}
+              <h3 className={`text-[15px] font-bold leading-snug "text-ink"`}>{r.title}</h3>
               <ReleaseBody lines={r.body} />
             </article>
           </li>
@@ -149,9 +149,9 @@ export default function ChangelogPage() {
               type="button"
               onClick={() => setKind(k)}
               aria-pressed={kind === k}
-              className={`flex w-full items-center gap-2.5 rounded-control px-2 py-2 text-left text-[13.5px] transition-colors ${kind === k ? "bg-bg-sunk font-medium text-ink dark:bg-bg-muted/60" : "text-ink-2 hover:bg-bg-sunk hover:text-ink"}`}
+              className={`flex w-full items-center gap-2.5 px-2 py-2 text-left text-[13.5px] transition-colors ${kind === k ? "bg-bg-sunk font-medium text-ink dark:bg-bg-muted/60" : "text-ink-2 hover:bg-bg-sunk hover:text-ink"}`}
             >
-              <span className={`size-1.5 rounded-full ${k ? KIND_DOT[k] : "bg-ink-2"}`} aria-hidden="true" />
+              <span className={`size-1.5 ${k ? KIND_DOT[k] : "bg-ink-2"}`} aria-hidden="true" />
               <span className="flex-1">{k ?? "すべて"}</span>
               <span className="num text-[12px] text-ink-4">{k ? data.releases.filter((r) => r.kind === k).length : data.releases.length}</span>
             </button>
@@ -163,7 +163,7 @@ export default function ChangelogPage() {
           {[...months.entries()].map(([month, m]) => {
             const [y, mo] = month.split("-").map(Number) as [number, number];
             return (
-              <a key={month} href={`#d-${m.first}`} className="flex items-center justify-between rounded-control px-2 py-2 text-[13.5px] text-ink-2 transition-colors hover:bg-bg-sunk hover:text-ink">
+              <a key={month} href={`#d-${m.first}`} className="flex items-center justify-between px-2 py-2 text-[13.5px] text-ink-2 transition-colors hover:bg-bg-sunk hover:text-ink">
                 {y} 年 {mo} 月<span className="num text-[12px] text-ink-4">{m.count} 件</span>
               </a>
             );
@@ -184,7 +184,7 @@ export default function ChangelogPage() {
     <PhoneBar back={{ to: "/more", label: "マイページ" }} title="更新履歴" />
     <ReadingLayout aside={aside}>
       <header className="pb-6">
-        <h1 data-page-title="" className="text-[24px] font-semibold leading-[1.3] text-ink">更新履歴</h1>
+        <h1 data-page-title="" className="t-display text-[28px] leading-[1.15] text-ink lg:text-[34px]">更新履歴</h1>
         <p className="mt-1.5 text-[13px] text-ink-3">新機能、変更、提供終了は、すべてここに書いています。</p>
       </header>
       <div className="space-y-4">

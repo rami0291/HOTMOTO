@@ -26,7 +26,7 @@ export function ReportArchive({ kind, index, current }: { kind: ReportKind; inde
   const groups = archiveGroups(kind, index);
   const openId = groups.find((g) => g.entries.some((e) => e.key === current))?.id ?? groups[0]?.id;
   return (
-    <aside className="sticky top-0 hidden h-dvh w-[280px] shrink-0 flex-col border-r border-line bg-[color-mix(in_srgb,var(--sidebar)_50%,var(--surface))] pl-5 pr-3 lg:flex dark:bg-[color-mix(in_srgb,var(--sidebar)_50%,var(--bg))]">
+    <aside className="sticky top-0 hidden h-dvh w-[280px] shrink-0 flex-col border-r border-line bg-bg-sunk pl-5 pr-3 lg:flex">
       <div className="pb-4 pt-8">
         <KindSwitch kind={kind} />
       </div>
@@ -80,7 +80,7 @@ function ArchiveGroup({ g, kind, current, initiallyOpen }: {
                 aria-current={on ? "page" : undefined}
                 title={e.title ?? undefined}
                 prefetch="intent"
-                className={`group flex gap-3 rounded-tile py-2.5 pl-2.5 pr-2 transition-colors ${on ? "bg-accent-soft" : "hover:bg-bg-sunk"}`}
+                className={`group flex gap-3 py-2.5 pl-2.5 pr-2 transition-colors ${on ? "bg-accent-soft" : "hover:bg-bg-sunk"}`}
               >
                 <span className="flex w-8 shrink-0 flex-col items-center">
                   <span className={`num text-[19px] font-black leading-none tracking-[-0.03em] ${on ? "text-accent" : "text-ink"}`}>{mark(e.key).big}</span>
@@ -101,7 +101,7 @@ function ArchiveGroup({ g, kind, current, initiallyOpen }: {
 export function ReportPhoneNav({ kind, index, current, today }: { kind: ReportKind; index: ReportNavigationEntry[]; current: string | null; today: string }) {
   const recent = index.slice(0, 3);
   const earlier = kind === "daily" ? "/daily/archive" : "#report-history";
-  const chip = "inline-flex h-11 shrink-0 items-center rounded-full border px-4 text-[13px] transition-colors";
+  const chip = "inline-flex h-11 shrink-0 items-center border px-4 text-[13px] transition-colors";
   if (recent.length === 0) return null;
   return (
     <nav aria-label={`最近の${KIND_LABEL[kind]}`} className="scrollbar-none bleed flex gap-2 overflow-x-auto pb-1 pt-1.5 lg:hidden">

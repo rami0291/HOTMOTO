@@ -146,6 +146,8 @@ export interface AdminPublication {
   revision: number;
   visibility: string;
   eligible: boolean;
+  /** On the aside shelf (the prefilter's ASIDE), never in the pool. */
+  aside: boolean;
   selected: boolean;
   seat: boolean;
   title: string;
@@ -187,7 +189,9 @@ export interface AdminContentChain {
   discoveries: Array<{ source_id: string; via: string; discovered_at: Timestamp }>;
   revisions: Array<{ revision: number; title: string; content_hash: string | null; created_at: Timestamp }>;
   analyses: Array<{
-    id: number; origin: string; model: string | null; prompt_version: string | null; input_revision: number; relevance: string | null; category: string | null;
+    id: number; origin: string; model: string | null; prompt_version: string | null; input_revision: number; relevance: string | null;
+    /** The prefilter's label (PASS, BLOCK, UNKNOWN, ASIDE); null for analyses not made by the models. */
+    prefilter_label: string | null; category: string | null;
     score: number | null; selected: boolean | null; title_zh: string | null; reason_zh: string | null; created_at: Timestamp;
     receipts: Array<{ id: number; status: string; service: string; model: string | null; cost: number | null; at: Timestamp }>;
   }>;

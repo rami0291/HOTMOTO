@@ -26,7 +26,7 @@ function FeedbackCard({ f }: { f: AdminFeedbackRow }) {
   const base = `/api/admin/feedback/${f.id}`;
   const version = new Date(f.updated_at).toISOString();
   return (
-    <article className="rounded-panel bg-surface p-4 ring-1 ring-line">
+    <article className="bg-surface p-4 ring-1 ring-line">
       <div className="flex flex-wrap items-center gap-2 text-[12.5px] text-ink-3">
         <span className="num font-medium text-ink-2">#{f.id}</span>
         <Badge tone={TONE[f.status] ?? "muted"}>{FEEDBACK_STATUS[f.status] ?? f.status}</Badge>
@@ -42,7 +42,7 @@ function FeedbackCard({ f }: { f: AdminFeedbackRow }) {
       <p className="mt-2.5 whitespace-pre-wrap text-[14px] leading-relaxed text-ink">{f.content}</p>
       {f.screenshot === "local" && (
         <a href={`${base}/screenshot`} target="_blank" rel="noreferrer" className="mt-2 inline-block">
-          <img src={`${base}/screenshot`} alt="フィードバックのスクリーンショット" loading="lazy" className="max-h-48 rounded-control ring-1 ring-line" />
+          <img src={`${base}/screenshot`} alt="フィードバックのスクリーンショット" loading="lazy" className="max-h-48 ring-1 ring-line" />
         </a>
       )}
       {f.screenshot === "feishu" && <p className="mt-2 text-[12.5px] text-ink-4">スクリーンショットはフィードバックと一緒に社内の飛書グループへ転送しました。</p>}

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { IconArrowUp } from "../icons";
 
-/** A thin accent line while a navigation is in flight (shown only if it takes a moment). */
+/** A thin signal bar on a mass rule while a navigation is in flight (shown only if it takes a moment). */
 export function NavigationProgress({ active }: { active: boolean }) {
   const [visible, setVisible] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -16,9 +16,9 @@ export function NavigationProgress({ active }: { active: boolean }) {
     };
   }, [active]);
   return (
-    <div className="pointer-events-none fixed inset-x-0 top-0 z-[60] h-[2px] overflow-hidden" aria-hidden="true">
+    <div className="pointer-events-none fixed inset-x-0 top-0 z-[60] h-[3px] overflow-hidden" aria-hidden="true">
       <div
-        className="h-full origin-left bg-[linear-gradient(90deg,var(--lavender),var(--accent))]"
+        className="h-full origin-left border-b border-mass bg-signal"
         style={{
           transform: `scaleX(${visible ? 0.85 : active ? 0 : 1})`,
           opacity: visible ? 1 : 0,
@@ -29,7 +29,7 @@ export function NavigationProgress({ active }: { active: boolean }) {
   );
 }
 
-/** Round "back to top" button once the reader has scrolled a screen or so (desktop; on phones the tab bar does it). */
+/** A "back to top" plate once the reader has scrolled a screen or so (desktop; on phones the tab bar does it). */
 export function BackToTop() {
   const [shown, setShown] = useState(false);
   useEffect(() => {
@@ -43,7 +43,7 @@ export function BackToTop() {
       type="button"
       aria-label="ページの先頭へ"
       onClick={() => window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" })}
-      className={`neu-raised fixed bottom-6 right-6 z-30 hidden size-12 items-center justify-center rounded-full text-ink-2 transition-all duration-200 hover:text-accent lg:flex ${
+      className={`plate fixed bottom-6 right-6 z-30 hidden size-12 items-center justify-center text-ink-2 transition-all duration-200 hover:text-ink lg:flex ${
         shown ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-2 opacity-0"
       }`}
     >

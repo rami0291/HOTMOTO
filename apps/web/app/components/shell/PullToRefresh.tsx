@@ -97,7 +97,7 @@ export function PullToRefresh() {
       className={`pointer-events-none fixed inset-x-0 top-[calc(var(--bar-h)+env(safe-area-inset-top))] z-30 flex justify-center lg:hidden ${dragging ? "" : "transition-[transform,opacity] duration-300 ease-[var(--ease-out-quart)]"}`}
       style={{ transform: `translateY(${pull - 44}px)`, opacity: pull === 0 && !loading ? 0 : 1 }}
     >
-      <span className="grid size-9 place-items-center rounded-full bg-surface text-accent shadow-[var(--shadow-soft)] ring-1 ring-line-soft">
+      <span className="grid size-9 place-items-center bg-surface text-accent ring-1 ring-line-soft">
         <span className="flex" style={loading ? undefined : { transform: `rotate(${progress * 300}deg)`, opacity: 0.35 + progress * 0.65 }}>
           <RingMark className="size-[18px]" spinning={loading} />
         </span>

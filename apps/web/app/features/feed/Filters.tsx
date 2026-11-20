@@ -79,7 +79,7 @@ export function FeedBar({ base, category, channel, minScore }: { base: "/" | "/a
       <PhoneBar
         leading={
           <Link to="/" aria-label={`${SITE.name} トップ`} className="flex h-11 items-center pl-2.5 pr-2 text-ink">
-            <Wordmark size={17} />
+            <Wordmark size={15} />
           </Link>
         }
         center={
@@ -98,7 +98,7 @@ export function FeedBar({ base, category, channel, minScore }: { base: "/" | "/a
           <>
             <BarButton label={filtered ? "絞り込み（選択中）" : "絞り込み"} on={filtered} onClick={() => setSheet(true)}>
               <IconFilter size={21} />
-              {filtered && <span aria-hidden="true" className="absolute right-[9px] top-[9px] size-[7px] rounded-full bg-accent ring-2 ring-surface" />}
+              {filtered && <span aria-hidden="true" className="absolute right-[8px] top-[8px] size-[8px] border-2 border-mass bg-signal" />}
             </BarButton>
             <SearchButton />
           </>
@@ -139,7 +139,7 @@ function SheetOptions({ options, active, onClose }: { options: Array<{ key: stri
               to={o.to}
               onClick={onClose}
               aria-current={on ? "true" : undefined}
-              className={`-mx-2 flex h-12 items-center justify-between rounded-tile px-2 text-[16px] transition-colors active:bg-bg-sunk ${on ? "font-semibold text-accent" : "text-ink"}`}
+              className={`-mx-2 flex h-12 items-center justify-between px-2 text-[16px] transition-colors active:bg-bg-sunk ${on ? "font-semibold text-accent" : "text-ink"}`}
             >
               {o.label}
               {on && <IconCheck size={19} strokeWidth={2.2} />}
@@ -160,7 +160,7 @@ export function ActiveFilters({ base, category, channel, tag, minScore }: { base
   const label = channel === "firstParty" ? CHANNEL_LABELS.firstParty : category ? CATEGORY_LABELS[category] : null;
   const score = minScore !== undefined && ITEM_COPY.showScore && scoreParam(minScore) !== null ? (minScore === 0 ? "AI スコア：すべて" : `AI スコア ${minScore} 以上`) : null;
   if (!label && !tag && !score) return null;
-  const chip = "neu-inset inline-flex min-h-11 max-w-full items-center gap-1 rounded-full pl-3.5 pr-2.5 text-[13px] font-medium text-accent transition-opacity active:opacity-60";
+  const chip = "sunk inline-flex min-h-11 max-w-full items-center gap-1 pl-3.5 pr-2.5 text-[13px] font-medium text-accent transition-opacity active:opacity-60";
   return (
     <div className="flex flex-wrap gap-2 pb-3 pt-1 lg:hidden">
       {label && (
@@ -233,7 +233,7 @@ export function SearchField({ defaultValue = "", keep = {} }: { defaultValue?: s
         placeholder="タイトル・要約を検索…"
         maxLength={200}
         autoComplete="off"
-        className="neu-inset h-[44px] w-full rounded-full pl-10 pr-10 text-[14px] text-ink outline-none transition-shadow placeholder:text-ink-4 focus:shadow-[var(--shadow-inset),0_0_0_2px_var(--accent)]"
+        className="sunk h-[44px] w-full pl-10 pr-10 text-[14px] text-ink outline-none transition-colors placeholder:text-ink-4 focus:border-ink"
       />
       {value ? (
         <button
@@ -243,12 +243,12 @@ export function SearchField({ defaultValue = "", keep = {} }: { defaultValue?: s
             setValue("");
             inputRef.current?.focus();
           }}
-          className="absolute right-3 top-1/2 grid size-6 -translate-y-1/2 place-items-center rounded-full bg-surface text-ink-4 shadow-[var(--shadow-thumb)] transition-colors hover:text-ink"
+          className="absolute right-3 top-1/2 grid size-6 -translate-y-1/2 place-items-center bg-surface text-ink-4 transition-colors hover:text-ink"
         >
           <IconClose size={13} />
         </button>
       ) : (
-        <kbd className="mono pointer-events-none absolute right-4 top-1/2 hidden -translate-y-1/2 rounded-mark bg-surface px-1.5 text-[10.5px] leading-4 text-ink-4 shadow-[var(--shadow-thumb)] lg:block">/</kbd>
+        <kbd className="t-data pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 border border-line-strong px-1.5 text-[10.5px] leading-4 text-ink-4 lg:block">/</kbd>
       )}
     </Form>
   );

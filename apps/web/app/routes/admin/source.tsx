@@ -131,7 +131,7 @@ export default function SourceDetail({ loaderData }: Route.ComponentProps) {
         <Stat label="直近 7 日" value={num(stats.last7d)} />
         <Stat label="厳選入り" value={num(stats.selected)} />
       </div>
-      {s.last_error && s.health !== "ok" && <div className="mb-5 rounded-card bg-hot-soft px-4 py-3 text-[13px] text-hot ring-1 ring-hot/20">{s.last_error}</div>}
+      {s.last_error && s.health !== "ok" && <div className="mb-5 bg-hot-soft px-4 py-3 text-[13px] text-hot ring-1 ring-hot/20">{s.last_error}</div>}
 
       {preview && (
         <Card className="mb-5" title={`プレビュー：${preview.count} 件（${preview.ms}ms、未保存）`} right={<button onClick={() => setPreview(null)}>閉じる</button>}>

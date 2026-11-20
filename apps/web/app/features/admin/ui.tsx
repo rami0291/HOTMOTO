@@ -22,7 +22,7 @@ export function AdminPage({ title, subtitle, actions, children }: { title: React
 
 export function Card({ title, right, children, className = "", pad = true }: { title?: ReactNode; right?: ReactNode; children: ReactNode; className?: string; pad?: boolean }) {
   return (
-    <section className={`rounded-panel bg-surface ring-1 ring-line ${className}`}>
+    <section className={`bg-surface ring-1 ring-line ${className}`}>
       {(title || right) && (
         <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3">
           <h2 className="text-[14px] font-semibold text-ink">{title}</h2>
@@ -37,7 +37,7 @@ export function Card({ title, right, children, className = "", pad = true }: { t
 export function Stat({ label, value, hint, tone }: { label: ReactNode; value: ReactNode; hint?: ReactNode; tone?: "ok" | "warn" | "bad" }) {
   const color = tone === "bad" ? "text-hot" : tone === "warn" ? "text-amber" : tone === "ok" ? "text-ok" : "text-ink";
   return (
-    <div className="rounded-panel bg-surface px-4 py-3.5 ring-1 ring-line">
+    <div className="bg-surface px-4 py-3.5 ring-1 ring-line">
       <div className="text-[12.5px] text-ink-3">{label}</div>
       <div className={`num mt-1 text-[22px] font-semibold tracking-tight ${color}`}>{value}</div>
       {hint && <div className="mt-0.5 text-[12px] text-ink-4">{hint}</div>}
@@ -57,7 +57,7 @@ const TONES: Record<Tone, string> = {
 
 export function Badge({ tone = "muted", children, title }: { tone?: Tone; children: ReactNode; title?: string }) {
   return (
-    <span title={title} className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2 py-0.5 text-[11.5px] font-medium ring-1 ${TONES[tone]}`}>
+    <span title={title} className={`inline-flex items-center gap-1 whitespace-nowrap px-2 py-0.5 text-[11.5px] font-medium ring-1 ${TONES[tone]}`}>
       {children}
     </span>
   );
@@ -67,8 +67,8 @@ export function Dot({ tone }: { tone: Tone }) {
   const c = tone === "ok" ? "bg-ok" : tone === "warn" ? "bg-amber" : tone === "bad" ? "bg-hot" : tone === "accent" ? "bg-accent" : "bg-ink-4";
   return (
     <span className="relative inline-flex size-2">
-      {tone === "bad" && <span className={`absolute inline-flex size-full animate-ping rounded-full opacity-50 ${c}`} />}
-      <span className={`relative inline-flex size-2 rounded-full ${c}`} />
+      {tone === "bad" && <span className={`absolute inline-flex size-full animate-ping opacity-50 ${c}`} />}
+      <span className={`relative inline-flex size-2 ${c}`} />
     </span>
   );
 }
@@ -153,7 +153,7 @@ export function Button({
       type="button"
       {...rest}
       disabled={rest.disabled || busy}
-      className={`inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-control font-medium transition-[opacity,background-color,transform] active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45 ${
+      className={`inline-flex items-center justify-center gap-1.5 whitespace-nowrap font-medium transition-[opacity,background-color,transform] active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45 ${
         size === "sm" ? "h-7 px-2.5 text-[12.5px]" : "h-9 px-3.5 text-[13.5px]"
       } ${BTN[tone]} ${className}`}
     >
@@ -167,7 +167,7 @@ export function ButtonLink({ to, children, tone = "secondary", size = "md" }: { 
   return (
     <Link
       to={to}
-      className={`inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-control font-medium transition-[opacity,background-color] ${
+      className={`inline-flex items-center justify-center gap-1.5 whitespace-nowrap font-medium transition-[opacity,background-color] ${
         size === "sm" ? "h-7 px-2.5 text-[12.5px]" : "h-9 px-3.5 text-[13.5px]"
       } ${BTN[tone]}`}
     >
@@ -176,7 +176,7 @@ export function ButtonLink({ to, children, tone = "secondary", size = "md" }: { 
   );
 }
 
-const INPUT = "w-full rounded-control bg-surface px-3 py-2 text-[13.5px] text-ink ring-1 ring-line-strong outline-none transition-shadow placeholder:text-ink-4 focus:ring-2 focus:ring-accent";
+const INPUT = "w-full bg-surface px-3 py-2 text-[13.5px] text-ink ring-1 ring-line-strong outline-none transition-shadow placeholder:text-ink-4 focus:ring-2 focus:ring-accent";
 
 export function Field({ label, hint, children }: { label: ReactNode; hint?: ReactNode; children: ReactNode }) {
   const id = useId();
@@ -222,7 +222,7 @@ export function FilterChips({ param, options }: { param: string; options: Array<
             key={o.value || "all"}
             to={`?${next}`}
             preventScrollReset
-            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[12.5px] transition-colors ${active ? "bg-ink text-bg" : "bg-surface text-ink-2 ring-1 ring-line hover:bg-bg-sunk"}`}
+            className={`inline-flex items-center gap-1.5 px-3 py-1 text-[12.5px] transition-colors ${active ? "bg-ink text-bg" : "bg-surface text-ink-2 ring-1 ring-line hover:bg-bg-sunk"}`}
           >
             {o.label}
             {o.count !== undefined && <span className={`num text-[11.5px] ${active ? "text-bg/70" : "text-ink-4"}`}>{o.count}</span>}
@@ -254,7 +254,7 @@ export function Pager({ page, hasMore }: { page: number; hasMore: boolean }) {
 export function Json({ value, collapsed = true, label = "元データ" }: { value: unknown; collapsed?: boolean; label?: string }) {
   const [open, setOpen] = useState(!collapsed);
   return (
-    <details open={open} onToggle={(event) => setOpen(event.currentTarget.open)} className="group rounded-control bg-bg-sunk/70 ring-1 ring-line">
+    <details open={open} onToggle={(event) => setOpen(event.currentTarget.open)} className="group bg-bg-sunk/70 ring-1 ring-line">
       <summary className="cursor-pointer select-none px-3 py-1.5 text-[12px] text-ink-3 hover:text-ink-2">{label}</summary>
       {open && <pre className="max-h-[420px] overflow-auto px-3 pb-3 font-mono text-[11.5px] leading-relaxed text-ink-2">{JSON.stringify(value, null, 2)}</pre>}
     </details>
@@ -314,7 +314,7 @@ export function ReasonDialog({
             animate={{ y: 0, scale: 1, opacity: 1 }}
             exit={{ y: 10, scale: 0.98, opacity: 0 }}
             transition={{ duration: 0.22, ease: [0.25, 1, 0.5, 1] }}
-            className="relative w-full max-w-lg rounded-sheet bg-raised p-5 shadow-2xl ring-1 ring-line-strong"
+            className="relative w-full max-w-lg bg-raised p-5 shadow-2xl ring-1 ring-line-strong"
             onSubmit={async (e) => {
               e.preventDefault();
               if (requireReason && !reason.trim()) return;

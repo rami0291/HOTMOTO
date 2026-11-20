@@ -50,11 +50,11 @@ function NavItem({ to, label, count, tone }: { to: string; label: string; count?
   return (
     <NavLink to={to} prefetch="intent" className="group relative block">
       {({ isActive }) => (
-        <span className={`relative flex items-center justify-between rounded-control px-3 py-[7px] text-[13.5px] transition-colors ${isActive ? "font-medium text-ink" : "text-ink-3 hover:text-ink"}`}>
-          {isActive && <motion.span layoutId="admin-nav" className="absolute inset-0 rounded-control bg-surface shadow-sm ring-1 ring-line" transition={{ type: "spring", stiffness: 520, damping: 38 }} />}
+        <span className={`relative flex items-center justify-between px-3 py-[7px] text-[13.5px] transition-colors ${isActive ? "font-medium text-ink" : "text-ink-3 hover:text-ink"}`}>
+          {isActive && <motion.span layoutId="admin-nav" className="absolute inset-0 bg-surface shadow-sm ring-1 ring-line" transition={{ type: "spring", stiffness: 520, damping: 38 }} />}
           <span className="relative">{label}</span>
           {!!count && (
-            <span className={`num relative min-w-5 rounded-full px-1.5 text-center text-[11px] font-semibold leading-5 ${tone === "bad" ? "bg-hot text-white" : "bg-accent-soft text-accent"}`}>{count}</span>
+            <span className={`num relative min-w-5 px-1.5 text-center text-[11px] font-semibold leading-5 ${tone === "bad" ? "bg-hot text-white" : "bg-accent-soft text-accent"}`}>{count}</span>
           )}
         </span>
       )}
@@ -99,7 +99,7 @@ export default function AdminLayout({ loaderData }: Route.ComponentProps) {
         </div>
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">
-        <div className="sticky top-0 z-40 border-b border-line bg-bg/85 backdrop-blur lg:hidden">
+        <div className="sticky top-0 z-40 border-b border-line bg-bg lg:hidden">
           <div className="flex items-center gap-2 px-4 pt-3">
             <RingMark className="size-5 text-accent" />
             <span className="text-[14px] font-semibold text-ink">{`${SITE.name} 管理画面`}</span>
@@ -110,7 +110,7 @@ export default function AdminLayout({ loaderData }: Route.ComponentProps) {
               const active = location.pathname === i.to || location.pathname.startsWith(`${i.to}/`);
               const n = i.count ? counts[i.count] : 0;
               return (
-                <NavLink key={i.to} to={i.to} className={`shrink-0 whitespace-nowrap rounded-full px-3 py-1 text-[13px] ${active ? "bg-ink text-bg" : "text-ink-3"}`}>
+                <NavLink key={i.to} to={i.to} className={`shrink-0 whitespace-nowrap px-3 py-1 text-[13px] ${active ? "bg-ink text-bg" : "text-ink-3"}`}>
                   {i.label}
                   {!!n && <span className="num ml-1 text-[11px] opacity-70">{n}</span>}
                 </NavLink>

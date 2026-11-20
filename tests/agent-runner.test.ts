@@ -8,7 +8,7 @@ import http from "node:http";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { after, test } from "node:test";
-import { askClaude, childEnv, claudeArgs, runAgent, type AgentTask, type Cli } from "../scripts/agent-runner.ts";
+import { askClaude, childEnv, claudeArgs, modelFor, parseModels, runAgent, waves, type AgentTask, type Cli } from "../scripts/agent-runner.ts";
 
 const TOKEN = "agent-token-for-runner-tests";
 const scratch = mkdtempSync(path.join(tmpdir(), "agent-runner-test-"));
@@ -80,8 +80,48 @@ test("the model's process gets what Claude Code needs to sign in, never the site
 });
 
 test("Claude Code runs with no tools and nothing from the machine's configuration", () => {
-  assert.deepEqual(claudeArgs("/tmp/s.md"),
-    ["-p", "--tools", "", "--safe-mode", "--strict-mcp-config", "--no-session-persistence", "--output-format", "json", "--system-prompt-file", "/tmp/s.md"]);
+  assert.deepEqual(claudeArgs("/tmp/s.md", "claude-sonnet-5-5"), [
+    "-p", "--tools", "", "--safe-mode", "--strict-mcp-config", "--no-session-persistence", "--model", "claude-sonnet-5-5", "--effort", "low",
+    "--output-format", "json", "--system-prompt-file", "/tmp/s.md",
+  ]);
+});
+
+test("each step has its own model, never the machine's default; AGENT_MODELS overrides steps or all of them", () => {
+  assert.equal(modelFor("prefilter_article"), "claude-haiku-5-5");
+  assert.equal(modelFor("score_article"), "claude-sonnet-5-5");
+  // A step the runner does not know yet gets the middle model.
+  assert.equal(modelFor("report_quarterly"), "claude-sonnet-5-5");
+  const models = parseModels(" score_article=claude-opus-5-5, *=claude-sonnet-5-5 ");
+  assert.equal(modelFor("score_article", models), "claude-opus-5-5");
+  assert.equal(modelFor("prefilter_article", models), "claude-sonnet-5-5");
+  assert.deepEqual(parseModels(undefined), {});
+  // A value that is not a model name never reaches the arguments.
+  for (const bad of ["score_article", "score_article=--tools", "score_article=a b", "=opus"]) assert.throws(() => parseModels(bad), /AGENT_MODELS/);
+});
+
+test("tasks that share an uncached prompt do not start together: one writes the cache, the rest read it", async () => {
+  const score = (id: number) => task(id, { system: "採点の基準" });
+  const structure = task(3, { purpose: "structure_article", system: "構造化の基準" });
+  const ids = (ws: AgentTask[][]) => ws.map((w) => w.map((t) => t.id));
+  assert.deepEqual(ids(waves([score(1), score(2), structure], new Map())), [[1, 3], [2]]);
+  // A prompt answered a minute ago is cached: its tasks all go at once.
+  const cached = new Map([[`score_article\n採点の基準`, Date.now() - 60_000]]);
+  assert.deepEqual(ids(waves([score(1), score(2), structure], cached)), [[1, 2, 3]]);
+  assert.deepEqual(ids(waves([score(1), score(2)], new Map([[`score_article\n採点の基準`, Date.now() - 10 * 60_000]]))), [[1], [2]]);
+
+  // In a run: the second score of the first take waits for the first; the next take's scores go together.
+  const { base } = await site([[score(1), score(2), structure], [score(4), score(5)]]);
+  const events: string[] = [];
+  const ask = async (t: AgentTask) => {
+    events.push(`start ${t.id}`);
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    events.push(`end ${t.id}`);
+    return "{}";
+  };
+  assert.deepEqual(await runAgent({ base, token: TOKEN, concurrency: 2, idleMs: 5, ask, log: () => {} }), { answered: 5, failed: 0 });
+  const at = (e: string) => events.indexOf(e);
+  assert.ok(at("start 3") < at("end 1") && at("start 2") > at("end 1"), events.join(", "));
+  assert.ok(at("start 5") < at("end 4"), events.join(", "));
 });
 
 test("each task runs alone: its input on stdin, its answer posted to its own address and nowhere else", async () => {
@@ -98,7 +138,7 @@ test("each task runs alone: its input on stdin, its answer posted to its own add
   const saved = Object.fromEntries(Object.keys(planted).map((k) => [k, process.env[k]]));
   Object.assign(process.env, planted);
   try {
-    const result = await runAgent({ base, token: TOKEN, concurrency: 2, idleMs: 5, ask: (t) => askClaude(t, fake.cli), log: () => {} });
+    const result = await runAgent({ base, token: TOKEN, concurrency: 2, idleMs: 5, ask: (t) => askClaude(t, modelFor(t.purpose), fake.cli), log: () => {} });
     assert.deepEqual(result, { answered: 3, failed: 0 });
   } finally {
     for (const [k, v] of Object.entries(saved)) {
@@ -124,10 +164,11 @@ test("each task runs alone: its input on stdin, its answer posted to its own add
   const scored = byInput.get("材料 11")!;
   assert.equal(scored.stdin, "材料 11");
   assert.equal(scored.system, `採点の基準\n\n答えは次の JSON Schema に合う JSON オブジェクト 1 つだけにする。\n${JSON.stringify(tasks[0]!.schema)}`);
-  assert.deepEqual(scored.args, claudeArgs(path.join(scored.cwd, "system.md")));
+  assert.deepEqual(scored.args, claudeArgs(path.join(scored.cwd, "system.md"), "claude-sonnet-5-5"));
   const summarized = byInput.get("材料 12")!;
   assert.equal(summarized.stdin, "材料 12\n\n【前回の答えが使えなかった理由】\nsummary: が空です");
   assert.equal(summarized.system, "要約の書き方\n\n答えの本文だけを出力し、前置きや説明を付けない。");
+  assert.deepEqual(summarized.args, claudeArgs(path.join(summarized.cwd, "system.md"), "claude-haiku-5-5"));
   // The hostile article is only stdin, never an argument; and no process sees another task.
   const attacked = calls.find((c) => c.stdin === hostile)!;
   assert.ok(attacked.args.every((a) => !a.includes("whoami") && !a.includes("attacker")));
@@ -144,13 +185,13 @@ test("three failures in a row stop the run; a task the site no longer waits for 
   const failing = Array.from({ length: 5 }, (_, i) => task(20 + i, { input: `FAIL ${i}` }));
   const { base, requests } = await site([failing]);
   const fake = fakeCli("failing");
-  const result = await runAgent({ base, token: TOKEN, concurrency: 1, idleMs: 5, ask: (t) => askClaude(t, fake.cli), log: () => {} });
+  const result = await runAgent({ base, token: TOKEN, concurrency: 1, idleMs: 5, ask: (t) => askClaude(t, modelFor(t.purpose), fake.cli), log: () => {} });
   assert.deepEqual(result, { answered: 0, failed: 3 });
   assert.equal(fake.calls().length, 3);
   assert.deepEqual(requests.map((r) => r.method), ["GET"]);
 
   const withdrawn = await site([[task(30)]], 404);
-  const again = await runAgent({ base: withdrawn.base, token: TOKEN, concurrency: 1, idleMs: 5, ask: (t) => askClaude(t, fakeCli("withdrawn").cli), log: () => {} });
+  const again = await runAgent({ base: withdrawn.base, token: TOKEN, concurrency: 1, idleMs: 5, ask: (t) => askClaude(t, modelFor(t.purpose), fakeCli("withdrawn").cli), log: () => {} });
   assert.deepEqual(again, { answered: 0, failed: 0 });
 });
 

@@ -22,7 +22,7 @@ function Step({ title, meta, children, tone = "accent", last }: { title: ReactNo
   return (
     <li className="relative pl-7">
       {!last && <span className="absolute left-[7px] top-4 h-full w-px bg-line-strong" aria-hidden />}
-      <span className={`absolute left-[3px] top-[7px] size-[9px] rounded-full ring-4 ring-bg ${dot}`} aria-hidden />
+      <span className={`absolute left-[3px] top-[7px] size-[9px] ring-4 ring-bg ${dot}`} aria-hidden />
       <div className="flex flex-wrap items-baseline justify-between gap-x-3">
         <h3 className="text-[13.5px] font-semibold text-ink">{title}</h3>
         {meta && <div className="text-[12px] text-ink-4">{meta}</div>}
@@ -97,7 +97,7 @@ export default function ContentItem({ loaderData }: Route.ComponentProps) {
         <Badge>処理 {a.processing_state}</Badge>
         {c.override && <Badge tone="info" title={c.override.reason ?? undefined}>手動設定あり v{c.override.version}</Badge>}
       </div>
-      {a.processing_error && <div className="mb-5 rounded-card bg-hot-soft px-4 py-3 text-[13px] text-hot ring-1 ring-hot/20">{a.processing_error}</div>}
+      {a.processing_error && <div className="mb-5 bg-hot-soft px-4 py-3 text-[13px] text-hot ring-1 ring-hot/20">{a.processing_error}</div>}
 
       <div className="grid gap-5 xl:grid-cols-[1fr_360px]">
         <Card title="処理の経路">
@@ -142,9 +142,10 @@ export default function ContentItem({ loaderData }: Route.ComponentProps) {
               {c.analyses.length ? (
                 <div className="space-y-3">
                   {c.analyses.map((an) => (
-                    <div key={an.id} className="rounded-control bg-bg-sunk/60 p-3 ring-1 ring-line">
+                    <div key={an.id} className="bg-bg-sunk/60 p-3 ring-1 ring-line">
                       <div className="flex flex-wrap items-center gap-1.5 text-[12px]">
                         <Badge tone={an.relevance === "pass" ? "ok" : "muted"}>{an.relevance}</Badge>
+                        {an.prefilter_label === "ASIDE" && <Badge tone="info">商品欄</Badge>}
                         {an.selected && <Badge tone="accent">入選</Badge>}
                         <Badge tone="info">点数 {an.score}</Badge>
                         {an.category && <Badge>{CATEGORY_LABELS[an.category as keyof typeof CATEGORY_LABELS] ?? an.category}</Badge>}
@@ -190,7 +191,7 @@ export default function ContentItem({ loaderData }: Route.ComponentProps) {
                 <span className="text-ink-4">公開の投影はありません（関連性を通らなかったか、処理中）</span>
               )}
               {c.override && (
-                <div className="mt-3 rounded-control bg-accent-softer p-3 ring-1 ring-accent/15">
+                <div className="mt-3 bg-bg-sunk p-3 ring-1 ring-accent/15">
                   <div className="text-[12px] text-ink-3">手動設定 v{c.override.version} · {c.override.updated_by} · {bj(c.override.updated_at, true)}{c.override.reason ? ` · ${c.override.reason}` : ""}</div>
                   <Json value={{ visibility: c.override.visibility, ...c.override.fields }} label="上書きした項目" collapsed={false} />
                 </div>
@@ -318,7 +319,7 @@ export default function ContentItem({ loaderData }: Route.ComponentProps) {
             ["summary-only", "要約のみ", "本文は表示せず、タイトルと要約は残す"],
             ["withdrawn", "取り下げ", "すべての出口から外し、リンクは 404"],
           ] as const).map(([v, label, hint]) => (
-            <label key={v} className={`cursor-pointer rounded-card p-3 ring-1 transition-colors ${visibility === v ? "bg-accent-soft ring-accent" : "ring-line-strong hover:bg-bg-sunk"}`}>
+            <label key={v} className={`cursor-pointer p-3 ring-1 transition-colors ${visibility === v ? "bg-accent-soft ring-accent" : "ring-line-strong hover:bg-bg-sunk"}`}>
               <input type="radio" name="visibility" className="sr-only" checked={visibility === v} onChange={() => setVisibility(v)} />
               <div className="text-[13.5px] font-medium text-ink">{label}</div>
               <div className="mt-0.5 text-[12px] text-ink-3">{hint}</div>
