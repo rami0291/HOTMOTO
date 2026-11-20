@@ -130,7 +130,7 @@ export function RssPanel(props: AgentPanelProps) {
           <div key={f.path} className="card flex flex-col p-4">
             <div className="flex items-center gap-2">
               <span className="text-[15px] font-semibold text-ink">{f.name}</span>
-              {f.badge && <span className="inline-flex h-[18px] items-center rounded-full bg-accent-soft px-2 text-[11px] font-medium text-accent">{f.badge}</span>}
+              {f.badge && <span className="inline-flex h-[18px] items-center bg-accent-soft px-2 text-[11px] font-medium text-accent">{f.badge}</span>}
             </div>
             <p className="mt-1 flex-1 text-[13px] leading-[1.7] text-ink-3">{f.desc}</p>
             <div className="mt-3 flex items-center gap-2 border-t border-line-soft pt-3">

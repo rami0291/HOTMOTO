@@ -49,7 +49,7 @@ export default function SelectBenchRun({ loaderData: d }: Route.ComponentProps) 
         {d.run.models.map((m) => {
           const s = d.run.summary[m] ?? {};
           return (
-            <button key={m} onClick={() => set("model", m)} className={`rounded-panel p-4 text-left ring-1 transition-colors ${m === model ? "bg-accent-softer ring-accent/40" : "bg-surface ring-line hover:bg-bg-sunk/60"}`}>
+            <button key={m} onClick={() => set("model", m)} className={`p-4 text-left ring-1 transition-colors ${m === model ? "bg-bg-sunk ring-accent/40" : "bg-surface ring-line hover:bg-bg-sunk/60"}`}>
               <div className="text-[13.5px] font-semibold text-ink">{m}</div>
               <div className="num mt-1.5 text-[22px] font-semibold tracking-tight text-ink">F1 {pct(s.f1)}</div>
               <div className="num mt-0.5 text-[12px] text-ink-3">正解率 {pct(s.accuracy)} · 適合率 {pct(s.precision)} · 再現率 {pct(s.recall)}</div>
@@ -110,7 +110,7 @@ export default function SelectBenchRun({ loaderData: d }: Route.ComponentProps) 
                             {d.run.models.map((m) => {
                               const x = r.by_model[m];
                               return (
-                                <div key={m} className="rounded-control bg-surface p-3 ring-1 ring-line">
+                                <div key={m} className="bg-surface p-3 ring-1 ring-line">
                                   <div className="mb-1 flex items-center justify-between text-[12px] text-ink-3"><span className="font-medium text-ink-2">{m}</span>{x?.category && <span>{CATEGORY_LABELS[x.category as keyof typeof CATEGORY_LABELS] ?? x.category}</span>}</div>
                                   <div className="text-[12.5px] leading-relaxed text-ink-2">{x?.error ?? x?.reason ?? "（理由なし）"}</div>
                                   <div className="mt-1 text-[11.5px] text-ink-4">関連性 {x?.relevance ?? "—"}{x?.receiptId ? ` · 受領記録 #${x.receiptId}` : ""}</div>

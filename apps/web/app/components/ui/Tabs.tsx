@@ -13,7 +13,7 @@ function placeOf(el: HTMLElement) {
 }
 
 /**
- * The white thumb inside the chosen option. It is rendered in place (so it is right without
+ * The mass block behind the chosen option. It is rendered in place (so it is right without
  * JavaScript) and, when the choice moves, glides over from where the previous thumb was.
  */
 function Thumb({ id }: { id: string }) {
@@ -35,7 +35,7 @@ function Thumb({ id }: { id: string }) {
       thumbs.set(id, placeOf(el));
     };
   }, [id, entrance]);
-  return <span ref={ref} className="absolute inset-0 rounded-full bg-surface shadow-[var(--shadow-thumb)] dark:bg-raised" />;
+  return <span ref={ref} className="absolute inset-0 bg-mass" />;
 }
 
 export interface TabItem {
@@ -57,7 +57,7 @@ const SIZES = {
 } as const;
 
 /**
- * The site's one switch control: a pill track pressed into the page with a raised thumb that glides to the chosen
+ * The site's one switch control: a sunk track with a mass block that glides to the chosen
  * option. Boards, categories, sources, report kinds, page sections and language all use it, so every
  * switch looks and moves the same. Scrolls sideways when it runs out of room; `fill` spreads the
  * options evenly across the available width.
@@ -83,7 +83,7 @@ export function PillTabs({
         data-pill-track=""
         aria-label={label}
         role={links ? undefined : "tablist"}
-        className={`${fill ? "grid w-full" : "inline-flex w-max"} neu-inset gap-0.5 rounded-full p-[3px]`}
+        className={`${fill ? "grid w-full" : "inline-flex w-max"} sunk gap-0.5 p-[3px]`}
         style={fill ? { gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` } : undefined}
       >
         {items.map((t) => {
@@ -93,11 +93,11 @@ export function PillTabs({
               {on && <Thumb id={layoutId} />}
               <span className="relative inline-flex items-center gap-1">
                 {t.label}
-                {t.count !== undefined && t.count !== null && <span className={`num text-[0.86em] font-normal ${on ? "text-accent/75" : "text-ink-4"}`}>{t.count}</span>}
+                {t.count !== undefined && t.count !== null && <span className={`t-data text-[0.84em] font-normal ${on ? "text-signal-on-mass" : "text-ink-4"}`}>{t.count}</span>}
               </span>
             </>
           );
-          const cls = `relative inline-flex shrink-0 select-none items-center justify-center whitespace-nowrap rounded-full font-medium outline-offset-1 transition-colors duration-150 active:scale-[0.98] ${SIZES[size]} ${on ? "font-semibold text-accent" : "text-ink-3 hover:text-ink"}`;
+          const cls = `relative inline-flex shrink-0 select-none items-center justify-center whitespace-nowrap font-medium outline-offset-1 transition-colors duration-150 active:scale-[0.98] ${SIZES[size]} ${on ? "font-semibold text-on-mass" : "text-ink-3 hover:bg-bg-sunk hover:text-ink"}`;
           const TabLink = t.prefetch === "intent" ? IntentLink : Link;
           return t.to ? (
             <TabLink key={t.key} to={t.to} replace={t.replace} preventScrollReset={!t.resetScroll} aria-current={on ? "page" : undefined} className={cls}>

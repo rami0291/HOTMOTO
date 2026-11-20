@@ -10,7 +10,7 @@ const OPTIONS: Array<{ key: Choice; label: string; icon: ReactNode }> = [
   { key: "light", label: "ライト", icon: <IconSun size={14} /> },
 ];
 
-/** Three-way appearance switch (dark / follow the system / light) with a sliding thumb. */
+/** Three-way appearance switch (dark / follow the system / light): a sunk track with a mass block that slides to the choice. */
 export function ThemeSwitch({ className = "" }: { className?: string }) {
   const pref = useThemePreference();
   const [mounted, setMounted] = useState(false);
@@ -32,10 +32,10 @@ export function ThemeSwitch({ className = "" }: { className?: string }) {
   };
 
   return (
-    <div role="radiogroup" aria-label="表示" className={`neu-inset relative grid h-[36px] grid-cols-3 rounded-full p-1 ${className}`}>
+    <div role="radiogroup" aria-label="表示" className={`sunk relative grid h-[34px] grid-cols-3 p-[3px] ${className}`}>
       <span
         aria-hidden="true"
-        className="absolute inset-y-1 left-1 w-[calc((100%-8px)/3)] rounded-full bg-surface shadow-[var(--shadow-thumb)] transition-transform duration-200 ease-[var(--ease-out-quart)] dark:bg-raised"
+        className="absolute inset-y-[3px] left-[3px] w-[calc((100%-6px)/3)] bg-mass transition-transform duration-200 ease-[var(--ease-out-quart)]"
         style={{ transform: `translateX(${index * 100}%)` }}
       />
       {OPTIONS.map((o) => (
@@ -46,7 +46,7 @@ export function ThemeSwitch({ className = "" }: { className?: string }) {
           aria-checked={current === o.key}
           title={o.label}
           onClick={() => choose(o.key)}
-          className={`relative z-10 flex items-center justify-center rounded-full transition-colors duration-150 ${current === o.key ? "text-accent" : "text-ink-4 hover:text-ink-2"}`}
+          className={`relative z-10 flex items-center justify-center transition-colors duration-150 ${current === o.key ? "text-on-mass" : "text-ink-4 hover:text-ink"}`}
         >
           {o.icon}
           <span className="sr-only">{o.label}</span>

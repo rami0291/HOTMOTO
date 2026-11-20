@@ -114,13 +114,13 @@ function stagesOf(stats: SiteStats | null): Stage[] {
 function MakerFace({ src }: { src: string }) {
   const [failed, setFailed] = useState(false);
   if (failed) return null;
-  return <img src={src} alt={`${ABOUT.maker?.name ?? ""}のアイコン`} width={48} height={48} onError={() => setFailed(true)} className="size-11 shrink-0 rounded-full bg-bg-sunk object-cover ring-1 ring-line xl:size-12" />;
+  return <img src={src} alt={`${ABOUT.maker?.name ?? ""}のアイコン`} width={48} height={48} onError={() => setFailed(true)} className="size-11 shrink-0 bg-bg-sunk object-cover ring-1 ring-line xl:size-12" />;
 }
 
 function QrCard({ src, kind, title, note }: { src: string; kind: string; title: string; note: string }) {
   return (
     <figure className="card flex items-center gap-5 p-5">
-      <img src={src} alt={`${kind}の QR コード`} width={112} height={112} loading="lazy" className="size-[104px] shrink-0 rounded-tile border border-line bg-white object-contain p-1.5 sm:size-[112px]" />
+      <img src={src} alt={`${kind}の QR コード`} width={112} height={112} loading="lazy" className="size-[104px] shrink-0 border border-line bg-white object-contain p-1.5 sm:size-[112px]" />
       <figcaption className="min-w-0">
         <div className="text-[12px] text-ink-4">{kind}</div>
         <div className="mt-1 text-[16px] font-semibold leading-snug text-ink">{title}</div>
@@ -254,7 +254,7 @@ export default function AboutPage() {
               onPointerLeave={() => setFocus(null)}
               onFocus={() => setFocus(i)}
               onBlur={() => setFocus(null)}
-              className={`border-line py-6 outline-none transition-colors ${STAGE_CELL[i]} ${focus === i ? "bg-accent-softer" : ""}`}
+              className={`border-line py-6 outline-none transition-colors ${STAGE_CELL[i]} ${focus === i ? "bg-bg-sunk" : ""}`}
             >
               <div className="flex items-baseline gap-2.5">
                 <span className="num text-[12px] font-bold tracking-[0.12em] text-accent">{s.no}</span>
@@ -270,7 +270,7 @@ export default function AboutPage() {
 
       {ABOUT.maker && <Maker maker={ABOUT.maker} contact={contact} />}
 
-      <p className="mt-16 well rounded-card px-5 py-4 text-[13px] leading-[1.85] text-ink-3">
+      <p className="mt-16 well px-5 py-4 text-[13px] leading-[1.85] text-ink-3">
         {ABOUT.copyright[0]}
         <Link viewTransition to="/feedback" className="text-accent hover:underline">
           フィードバックページ

@@ -12,7 +12,7 @@ export function CopyButton({ text, label = "コピー", className = "" }: { text
         setCopied(true);
         setTimeout(() => setCopied(false), 1500);
       }}
-      className={`inline-flex h-7 items-center gap-1 rounded-mark border border-line bg-surface px-2 text-[12px] transition-colors ${copied ? "text-ok" : "text-ink-3 hover:border-line-strong hover:text-ink"} ${className}`}
+      className={`inline-flex h-7 items-center gap-1 border border-line bg-surface px-2 text-[12px] transition-colors ${copied ? "text-ok" : "text-ink-3 hover:border-line-strong hover:text-ink"} ${className}`}
       aria-label={copied ? "コピーしました" : label}
     >
       <span key={copied ? "ok" : "copy"} className={copied ? "anim-swap-in" : ""}>
@@ -26,7 +26,7 @@ export function CopyButton({ text, label = "コピー", className = "" }: { text
 /** Code panel on the page's quiet grey, with a copy button; `lang` is only a label. Prompts in plain words `wrap`. */
 export function CodeBlock({ code, lang, title, wrap = false, className = "my-4" }: { code: string; lang?: string; title?: string; wrap?: boolean; className?: string }) {
   return (
-    <div className={`overflow-hidden rounded-card border border-line bg-surface ${className}`}>
+    <div className={`overflow-hidden border border-line bg-surface ${className}`}>
       <div className="flex items-center justify-between border-b border-line-soft px-4 py-2">
         <span className="text-[12px] text-ink-4">{title ?? lang ?? ""}</span>
         <CopyButton text={code} />

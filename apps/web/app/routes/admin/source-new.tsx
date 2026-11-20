@@ -97,7 +97,7 @@ export default function NewSource() {
             {error && <div className="mt-1 text-[12.5px] text-hot">{error}</div>}
           </div>
           {duplicate && (
-            <div className="mt-4 rounded-card bg-amber/10 px-4 py-3 text-[13px] text-ink-2 ring-1 ring-amber/25">
+            <div className="mt-4 bg-amber/10 px-4 py-3 text-[13px] text-ink-2 ring-1 ring-amber/25">
               このアドレスはすでに監視中です：<Link className="font-medium text-accent" to={`/admin/sources/${encodeURIComponent(duplicate.id)}`}>{duplicate.name}</Link>（{duplicate.id}）。新規作成はしていません。
             </div>
           )}

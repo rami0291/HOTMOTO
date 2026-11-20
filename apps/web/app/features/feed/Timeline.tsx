@@ -31,7 +31,10 @@ function fromResponse(r: TimelineResponse): ListState {
   return { version: 2, cards: r.cards, nextCursor: r.nextCursor, dayCounts: r.dayCounts, collapsed: [], batches: 1 };
 }
 
-/** Sticky day header under the phone bar: a quiet row on desktop, a grey full-width bar on phones. */
+const dateFlag = (today: boolean) =>
+  `mass-face chamfer cut-sm relative flex h-8 items-center whitespace-nowrap pr-4 text-left text-[16px] font-bold tracking-[0.02em] ${today ? "pl-4" : "pl-3"}`;
+
+/** Sticky day header under the phone bar: a dated flag and scale on desktop, a full-width bar on phones. */
 export function DayHeader({ day, today, count, collapsed, onToggle, aside }: { day: string; today: string; count: number | null; collapsed?: boolean; onToggle?: () => void; aside?: React.ReactNode }) {
   const date = monthDay(day);
   const weekday = siteWeekday(day);
@@ -53,7 +56,7 @@ export function DayHeader({ day, today, count, collapsed, onToggle, aside }: { d
     </>
   );
   return (
-    <div className="bleed sticky top-[var(--bar-h)] z-20 bg-daybar lg:mx-0 lg:bg-bg lg:px-0">
+    <div className="bleed sticky top-[var(--bar-h)] z-20 bg-bg lg:mx-0 lg:bg-bg lg:px-0">
       {/* Phones: a full-width day bar; on the timeline the whole bar folds the day. */}
       {onToggle ? (
         <button type="button" onClick={onToggle} aria-expanded={!collapsed} aria-label={`${date}を${collapsed ? "開く" : "閉じる"}`} className="flex h-11 w-full items-center gap-2 text-left lg:hidden">
@@ -62,14 +65,19 @@ export function DayHeader({ day, today, count, collapsed, onToggle, aside }: { d
       ) : (
         <div className="flex h-9 items-center gap-2 lg:hidden">{phoneRow}</div>
       )}
-      {/* Desktop: date text shares the page's left edge, regardless of how many digits it has. */}
-      <div className="hidden h-11 items-center gap-3 lg:flex">
+      {/* Desktop: the date on a mass flag (today's carries the signal tick), the weekday and count, then a
+          scale running to the edge. */}
+      <div className="hidden h-12 items-center gap-3 lg:flex">
         {onToggle ? (
-          <button type="button" onClick={onToggle} aria-expanded={!collapsed} className="whitespace-nowrap text-left text-[18px] font-semibold leading-6 text-ink">
+          <button type="button" onClick={onToggle} aria-expanded={!collapsed} className={dateFlag(day === today)}>
+            {day === today && <span className="absolute inset-y-0 left-0 w-1 bg-signal" aria-hidden="true" />}
             {date}
           </button>
         ) : (
-          <time dateTime={day} className="whitespace-nowrap text-[18px] font-semibold leading-6 text-ink">{date}</time>
+          <time dateTime={day} className={dateFlag(day === today)}>
+            {day === today && <span className="absolute inset-y-0 left-0 w-1 bg-signal" aria-hidden="true" />}
+            {date}
+          </time>
         )}
         {onToggle ? (
           <button
@@ -77,21 +85,21 @@ export function DayHeader({ day, today, count, collapsed, onToggle, aside }: { d
             onClick={onToggle}
             aria-expanded={!collapsed}
             aria-label={collapsed ? `${date}を開く` : `${date}を閉じる`}
-            className="grid size-6 place-items-center justify-self-center rounded-full bg-surface text-ink-4 shadow-[var(--shadow-thumb)] transition-[color,box-shadow] hover:text-accent active:shadow-[var(--shadow-inset-sm)]"
+            className="grid size-6 place-items-center border border-line-strong text-ink-4 transition-colors hover:border-ink hover:text-ink"
           >
             <IconChevronDown size={14} className={`transition-transform duration-200 ${collapsed ? "-rotate-90" : ""}`} />
           </button>
         ) : null}
-        <span className="text-[13px] text-ink-4">
+        <span className="whitespace-nowrap text-[13px] text-ink-3">
           {weekday}
           {count !== null && (
-            <>
-              {" · "}
-              <span className="num">{count}</span> 件
-            </>
+            <span className="t-data ml-2 text-[12px] text-ink-4">
+              {String(count).padStart(2, "0")} 件
+            </span>
           )}
         </span>
-        {aside && <span className="ml-auto text-[12px] text-ink-4">{aside}</span>}
+        <span className="ruler min-w-8 flex-1 text-line" aria-hidden="true" />
+        {aside && <span className="text-[12px] text-ink-4">{aside}</span>}
       </div>
     </div>
   );
@@ -110,14 +118,12 @@ export function TimelineSlot({ at, children, fresh = false, delay = 0, dataKey }
     >
       {/* Phones: the row without the rail (the item shows its time); a hairline between rows. */}
       <div className="grid grid-cols-[minmax(0,1fr)] border-b border-line-soft py-3.5 group-last/slot:border-b-0 lg:grid-cols-[64px_22px_minmax(0,1fr)] lg:border-b-0 lg:py-0 lg:pb-3 lg:group-last/slot:pb-0">
-        <time dateTime={at} className="mono hidden text-ink-3 lg:block lg:pt-[17px] lg:text-[12.5px] lg:font-semibold lg:leading-6">
+        <time dateTime={at} className="t-data hidden text-ink-3 lg:block lg:pt-[17px] lg:text-[12px] lg:leading-6">
           {siteTime(at)}
         </time>
         <span aria-hidden="true" className="relative hidden lg:block">
-          <span className="absolute -bottom-[41px] left-[10px] top-[29px] w-[2px] rounded-full bg-lavender/45 group-last/slot:hidden" />
-          <span className="absolute left-[5px] top-[23px] grid size-3 place-items-center rounded-full bg-bg shadow-[var(--shadow-thumb)] transition-transform duration-300 group-hover/slot:scale-[1.2]">
-            <span className="size-1.5 rounded-full bg-accent" />
-          </span>
+          <span className="absolute -bottom-[41px] left-[10px] top-[29px] w-px bg-line-strong group-last/slot:hidden" />
+          <span className="absolute left-[6px] top-[24px] size-[9px] border-2 border-mass bg-signal transition-transform duration-300 group-hover/slot:rotate-45" />
         </span>
         {children}
       </div>
@@ -326,17 +332,23 @@ function FeedEnd({ loading, error, hasMore, manual, empty, onMore }: { loading: 
           <RingMark className="size-4 text-accent" spinning /> 読み込み中
         </span>
       ) : error ? (
-        <button type="button" onClick={onMore} className="h-9 rounded-full border border-hot/30 px-4 text-[13px] text-hot hover:bg-hot-soft">
+        <button type="button" onClick={onMore} className="h-9 border border-hot px-4 text-[13px] text-hot hover:bg-bg-sunk">
           読み込みに失敗しました。タップして再試行
         </button>
       ) : hasMore ? (
         manual && (
-          <button type="button" onClick={onMore} className="h-9 rounded-full border border-line-strong bg-surface px-5 text-[13px] font-medium text-ink-2 transition-colors hover:border-ink-4 hover:text-ink">
+          <button type="button" onClick={onMore} className="plate h-9 px-5 text-[13px] font-medium text-ink-2 hover:text-ink">
             さらに読み込む
           </button>
         )
       ) : (
-        !empty && <span className="text-[12px] text-ink-4">これで全部です</span>
+        !empty && (
+          <span className="flex w-full max-w-md items-center gap-3 text-ink-4">
+            <span className="hatch-mass h-2 flex-1 text-line" aria-hidden="true" />
+            <span className="t-micro shrink-0">END OF LOG · これで全部です</span>
+            <span className="hatch-mass h-2 flex-1 text-line" aria-hidden="true" />
+          </span>
+        )
       )}
     </div>
   );

@@ -38,8 +38,8 @@ const BADGES: Record<HotEntryView["badges"][number], { label: string; tone: "hot
   rising: { label: "拡大中", tone: "amber", hint: "話題がまだ増えている" },
 };
 
-const RANK_COLOR = ["text-rank-1", "text-rank-2", "text-rank-3"];
-const rankColor = (rank: number) => RANK_COLOR[rank - 1] ?? "text-rank-rest";
+const RANK_COLOR = ["text-accent", "text-ink", "text-ink"];
+const rankColor = (rank: number) => RANK_COLOR[rank - 1] ?? "text-ink-4";
 const pad = (rank: number) => String(rank).padStart(2, "0");
 
 /** "あるメディア、あるアカウント など 4 件の情報源 · 参加者 7 件". */
@@ -86,7 +86,7 @@ function HeatPanel({ e }: { e: HotEntryView }) {
   const peak = Math.max(...seen);
   const peakAt = e.spark.findIndex((v) => v === peak);
   return (
-    <div className="order-first flex aspect-[2/1] flex-col rounded-panel bg-accent-softer p-4 ring-1 ring-inset ring-line-soft xl:order-none xl:aspect-[16/10] dark:bg-accent-soft">
+    <div className="order-first flex aspect-[2/1] flex-col dot-grid bg-bg-sunk p-4 ring-1 ring-inset ring-line xl:order-none xl:aspect-[16/10]">
       <div className="flex items-baseline justify-between text-[11.5px] text-ink-4">
         <span className="font-semibold text-ink-3">24 時間の話題度</span>
         <span>
@@ -121,7 +121,7 @@ function Lead({ e }: { e: HotEntryView }) {
           {e.summary && <p className="mt-3 line-clamp-3 text-[14px] leading-[1.75] text-ink-3">{e.summary}</p>}
         </div>
         {e.cover ? (
-          <div className="order-first overflow-hidden well rounded-panel xl:order-none">
+          <div className="order-first overflow-hidden well xl:order-none">
             <img src={e.cover.url} srcSet={e.cover.srcSet} sizes="(min-width: 1280px) calc(28vw - 96px), (min-width: 1024px) calc(58vw - 180px), (min-width: 640px) 568px, calc(100vw - 74px)" width={e.cover.width ?? undefined} height={e.cover.height ?? undefined} alt="" loading="eager" fetchPriority="high" decoding="async" className="aspect-[16/9] size-full object-cover transition-transform duration-500 group-hover:scale-[1.02] xl:aspect-[16/10]" />
           </div>
         ) : (
@@ -263,14 +263,11 @@ export default function HotPage() {
       />
       <header className="hidden flex-wrap items-end justify-between gap-x-6 gap-y-2 pb-5 pt-1 lg:flex">
         <div>
-          <div className="flex items-center gap-2 text-[12px] font-semibold tracking-[0.08em] text-hot">
-            <span className="relative flex size-2" aria-hidden="true">
-              <span className="absolute inline-flex size-full animate-ping rounded-full bg-hot opacity-30" />
-              <span className="relative inline-flex size-2 rounded-full bg-hot" />
-            </span>
+          <div className="t-label flex items-center gap-2 text-[11px] text-accent">
+            <span className="hatch h-2.5 w-5" aria-hidden="true" />
             リアルタイムの話題度
           </div>
-          <h1 className="mt-1.5 text-[24px] font-bold leading-[1.3] tracking-[-0.01em] text-ink lg:text-[26px]">{withSubject("ホットランキング")}</h1>
+          <h1 className="mt-2 t-display text-[28px] leading-[1.15] text-ink lg:text-[34px]">{withSubject("ホットランキング")}</h1>
           <p className="mt-1.5 text-[13.5px] text-ink-3">過去 {hot.windowHours}{` 時間に、${withSubject("業界")}で最も話題になった `}{hot.entries.length || 10} の出来事</p>
         </div>
         {hot.computedAt && (
@@ -281,7 +278,7 @@ export default function HotPage() {
       </header>
 
       {!lead ? (
-        <div className="card rounded-sheet">
+        <div className="card">
           <EmptyState title="いまは話題がありません">十分な数の情報源がともに話題にしている出来事はまだありません。</EmptyState>
         </div>
       ) : (

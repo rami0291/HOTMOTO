@@ -123,7 +123,7 @@ export function HeatChart({ points: all }: { points: HeatPoint[] }) {
     return { seen, last, peak, change, ticks, x, y, line, area, labels: timeTicks(t0, t1) };
   }, [series]);
   if (!geometry) {
-    return <p className="rounded-tile bg-bg-sunk px-4 py-8 text-center text-[13px] text-ink-4">連続した観測データがまだ足りないため、推移はまだ描きません。</p>;
+    return <p className="bg-bg-sunk px-4 py-8 text-center text-[13px] text-ink-4">連続した観測データがまだ足りないため、推移はまだ描きません。</p>;
   }
   const { seen, last, peak, change, ticks, x, y, line, area, labels } = geometry;
   const cur = active !== null ? seen[active] : null;
@@ -149,7 +149,7 @@ export function HeatChart({ points: all }: { points: HeatPoint[] }) {
             <span className="num text-[12px] text-ink-4">{monthDayTime(new Date(peak.t).toISOString())}</span>
           </Stat>
           <Stat label="直近 24 時間の変化">
-            <span className={`mono text-[22px] font-semibold leading-none tracking-[-0.02em] ${change === null ? "text-ink-4" : change > 0 ? "text-hot" : "text-ink"}`}>
+            <span className={`mono text-[22px] font-semibold leading-none tracking-[-0.02em] ${change === null ? "text-ink-4" : change > 0 ? "text-accent" : "text-ink"}`}>
               {change === null ? "–" : `${change > 0 ? "+" : ""}${change}%`}
             </span>
           </Stat>
@@ -177,7 +177,7 @@ export function HeatChart({ points: all }: { points: HeatPoint[] }) {
           </span>
         ))}
         <div
-          className="relative size-full touch-pan-y select-none rounded-mark outline-offset-4"
+          className="relative size-full touch-pan-y select-none outline-offset-4"
           role="img"
           aria-label={`話題度の推移：現在 ${Math.round(last.p!.heat)}、ピーク ${Math.round(peak.p!.heat)}`}
           tabIndex={0}
@@ -211,16 +211,16 @@ export function HeatChart({ points: all }: { points: HeatPoint[] }) {
           {cur ? (
             <>
               <span className="pointer-events-none absolute inset-y-0 w-px -translate-x-1/2 bg-line-strong" style={{ left: `${x(cur.t)}%` }} />
-              <span className="pointer-events-none absolute size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent ring-2 ring-surface" style={at(cur)} />
+              <span className="pointer-events-none absolute size-2.5 -translate-x-1/2 -translate-y-1/2 bg-accent ring-2 ring-surface" style={at(cur)} />
             </>
           ) : (
-            <span className={`pointer-events-none absolute grid size-5 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-accent/20 ${entrance ? "anim-fade-in" : ""}`} style={{ ...at(last), ...(entrance ? { animationDelay: "650ms" } : {}) }}>
-              <span className="size-2.5 rounded-full bg-accent ring-2 ring-surface" />
+            <span className={`pointer-events-none absolute grid size-5 -translate-x-1/2 -translate-y-1/2 place-items-center bg-accent/20 ${entrance ? "anim-fade-in" : ""}`} style={{ ...at(last), ...(entrance ? { animationDelay: "650ms" } : {}) }}>
+              <span className="size-2.5 bg-accent ring-2 ring-surface" />
             </span>
           )}
           {cur && (
             <div
-              className="pointer-events-none absolute top-0 z-10 whitespace-nowrap rounded-control border border-line bg-raised px-2.5 py-1.5 text-[12px] shadow-[var(--shadow-pop)]"
+              className="pointer-events-none absolute top-0 z-10 whitespace-nowrap border border-line bg-raised px-2.5 py-1.5 text-[12px]"
               style={x(cur.t) > 55 ? { right: `calc(${100 - x(cur.t)}% + 10px)` } : { left: `calc(${x(cur.t)}% + 10px)` }}
             >
               <div className="num text-ink-4">{monthDayTime(new Date(cur.t).toISOString())}</div>

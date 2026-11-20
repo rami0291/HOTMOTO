@@ -32,8 +32,8 @@ export default function PosterSheet({ id, title, open, onClose }: { id: string; 
   return (
     <Sheet open={open} onClose={onClose} title="シェア用ポスター" centered>
       <div className="flex flex-col items-center px-5 sm:px-7">
-        <div className="relative aspect-[3/4] w-full max-w-[min(360px,calc((88dvh-200px)*0.75))] overflow-hidden rounded-card border border-line bg-bg-sunk">
-          {!loaded && !failed && <div className="absolute inset-0 animate-pulse bg-[linear-gradient(110deg,transparent_30%,rgba(255,255,255,0.35)_50%,transparent_70%)] bg-[length:200%_100%]" />}
+        <div className="relative aspect-[3/4] w-full max-w-[min(360px,calc((88dvh-200px)*0.75))] overflow-hidden border border-line bg-bg-sunk">
+          {!loaded && !failed && <div className="skeleton absolute inset-0" />}
           {failed ? (
             <p className="absolute inset-0 grid place-items-center px-6 text-center text-[13px] text-ink-3">ポスターを作れませんでした。しばらくしてからもう一度お試しください。</p>
           ) : (
@@ -51,12 +51,12 @@ export default function PosterSheet({ id, title, open, onClose }: { id: string; 
           <a
             href={src}
             download={`${SITE.mcpPrefix}-${id}.png`}
-            className="inline-flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full bg-accent text-[14px] font-medium text-accent-contrast transition-colors hover:bg-accent-ink lg:h-10 sm:text-[13.5px]"
+            className="signal-face inline-flex h-11 flex-1 items-center justify-center gap-1.5 text-[14px] font-semibold lg:h-10 sm:text-[13.5px]"
           >
             <IconDownload size={15} /> 画像を保存
           </a>
           {canShareFile && (
-            <button type="button" onClick={share} className="inline-flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full border border-line-strong bg-surface text-[14px] font-medium text-ink transition-colors hover:border-ink-4 lg:h-10 sm:text-[13.5px]">
+            <button type="button" onClick={share} className="plate inline-flex h-11 flex-1 items-center justify-center gap-1.5 text-[14px] font-medium text-ink lg:h-10 sm:text-[13.5px]">
               <IconShare size={15} /> シェア
             </button>
           )}

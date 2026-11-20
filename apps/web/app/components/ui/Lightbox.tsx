@@ -95,7 +95,7 @@ export function Lightbox({ images, index, onIndex, onClose }: { images: Lightbox
 
   const current = open ? images[index!]! : null;
   const many = images.length > 1;
-  const nav = "absolute top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20";
+  const nav = "absolute top-1/2 grid size-11 -translate-y-1/2 place-items-center bg-white/10 text-white transition-colors hover:bg-white/20";
   if (typeof document === "undefined") return null;
   return createPortal(
     <Presence show={open} enter="anim-fade-in" exit="anim-fade-out" duration={160}>
@@ -115,9 +115,9 @@ export function Lightbox({ images, index, onIndex, onClose }: { images: Lightbox
         className="fixed inset-0 z-[80] grid cursor-zoom-out touch-pinch-zoom place-items-center bg-black/85 p-4 sm:p-10"
       >
         {current && (
-          <img ref={img} key={current.src} src={current.src} decoding="async" alt={current.alt ?? ""} className="lightbox-img anim-zoom-in min-h-0 min-w-0 max-h-[calc(100dvh-5rem)] max-w-full rounded-control object-contain shadow-2xl" />
+          <img ref={img} key={current.src} src={current.src} decoding="async" alt={current.alt ?? ""} className="lightbox-img anim-zoom-in min-h-0 min-w-0 max-h-[calc(100dvh-5rem)] max-w-full object-contain" />
         )}
-        <button ref={closeButton} type="button" aria-label="閉じる" onClick={(e) => { e.stopPropagation(); onClose(); }} className="absolute right-[max(16px,env(safe-area-inset-right))] top-[max(16px,env(safe-area-inset-top))] grid size-11 place-items-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20">
+        <button ref={closeButton} type="button" aria-label="閉じる" onClick={(e) => { e.stopPropagation(); onClose(); }} className="absolute right-[max(16px,env(safe-area-inset-right))] top-[max(16px,env(safe-area-inset-top))] grid size-11 place-items-center bg-white/10 text-white transition-colors hover:bg-white/20">
           <IconClose size={18} />
         </button>
         {many && index !== null && (
@@ -128,7 +128,7 @@ export function Lightbox({ images, index, onIndex, onClose }: { images: Lightbox
             <button type="button" aria-label="次の画像" onClick={(e) => { e.stopPropagation(); onIndex((index + 1) % images.length); }} className={`${nav} right-[max(12px,env(safe-area-inset-right))] sm:right-5`}>
               <IconArrowRight size={18} />
             </button>
-            <span className="num pointer-events-none absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-black/40 px-2.5 py-0.5 text-[12px] text-white/85">
+            <span className="num pointer-events-none absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/40 px-2.5 py-0.5 text-[12px] text-white/85">
               {index + 1} / {images.length}
             </span>
           </>

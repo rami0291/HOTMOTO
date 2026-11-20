@@ -16,12 +16,12 @@ export function Faces({ participants, total, size = 24, interactive = true }: { 
   const faces = (
     <>
       {shown.map((p, i) => (
-        <span key={p.name} className={`rounded-full ring-2 ring-surface ${i ? "-ml-1.5" : ""}`}>
+        <span key={p.name} className={`ring-2 ring-surface ${i ? "-ml-1.5" : ""}`}>
           <SourceAvatar name={p.name} iconUrl={p.iconUrl} iconSrcSet={p.iconSrcSet} size={size} />
         </span>
       ))}
       {rest > 0 && (
-        <span className="-ml-1.5 inline-flex items-center justify-center rounded-full bg-bg-sunk px-1.5 text-[10.5px] font-medium text-ink-3 ring-2 ring-surface dark:bg-bg-muted" style={{ height: size, minWidth: size }}>
+        <span className="-ml-1.5 inline-flex items-center justify-center bg-bg-sunk px-1.5 text-[10.5px] font-medium text-ink-3 ring-2 ring-surface dark:bg-bg-muted" style={{ height: size, minWidth: size }}>
           +{rest}
         </span>
       )}
@@ -81,12 +81,12 @@ function FacesButton({ participants, total, names, children }: { participants: H
           const below = window.innerHeight - r.bottom > 240;
           setAt({ top: below ? r.bottom + 6 : Math.max(8, r.top - 6 - 240), left: Math.min(Math.max(8, r.left), document.documentElement.clientWidth - 248) });
         }}
-        className="-m-1 flex items-center rounded-full p-1 outline-offset-2"
+        className="-m-1 flex items-center p-1 outline-offset-2"
       >
         {children}
       </button>
       {open && createPortal(
-        <span ref={popup} id={id} role="dialog" aria-label="話題にしている情報源" style={at} className="fixed z-50 max-h-[240px] w-[240px] overflow-y-auto rounded-control border border-line bg-raised p-3 text-[12.5px] leading-relaxed text-ink-2 shadow-[var(--shadow-pop)]">
+        <span ref={popup} id={id} role="dialog" aria-label="話題にしている情報源" style={at} className="fixed z-50 max-h-[240px] w-[240px] overflow-y-auto border border-line bg-raised p-3 text-[12.5px] leading-relaxed text-ink-2">
           {editorial.length > 0 && (
             <>
               <span className="block text-[11.5px] font-semibold text-ink-4">主な情報源</span>

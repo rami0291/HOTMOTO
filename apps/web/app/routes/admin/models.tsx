@@ -48,7 +48,7 @@ function ProcessingCard({ p }: { p: AdminModels["processing"] }) {
     >
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
         <div className="space-y-3">
-          <div role="radiogroup" aria-label="処理方式" className="neu-inset grid grid-cols-2 gap-1 rounded-full p-1">
+          <div role="radiogroup" aria-label="処理方式" className="sunk grid grid-cols-2 gap-1 p-1">
             {(["agent", "api"] as const).map((mode) => {
               const on = p.mode === mode;
               return (
@@ -58,7 +58,7 @@ function ProcessingCard({ p }: { p: AdminModels["processing"] }) {
                   role="radio"
                   aria-checked={on}
                   onClick={() => !on && setChange({ mode })}
-                  className={`h-9 rounded-full text-[13.5px] font-medium transition-[box-shadow,color] ${on ? "bg-surface text-accent shadow-[var(--shadow-thumb)]" : "text-ink-3 hover:text-ink"}`}
+                  className={`h-9 text-[13.5px] font-medium transition-[box-shadow,color] ${on ? "bg-surface text-accent" : "text-ink-3 hover:text-ink"}`}
                 >
                   {mode === "agent" ? "Agent（API を使わない）" : "API"}
                 </button>
@@ -78,7 +78,7 @@ function ProcessingCard({ p }: { p: AdminModels["processing"] }) {
             </Button>
           </div>
           {agent && !p.agentReady && (
-            <p className="rounded-control bg-hot-soft px-3 py-2 text-[12.5px] leading-relaxed text-hot">
+            <p className="bg-hot-soft px-3 py-2 text-[12.5px] leading-relaxed text-hot">
               AGENT_TOKEN が設定されていないため、作業のインターフェースは閉じています。.env に 16 文字以上の AGENT_TOKEN を設定して再起動してください。
             </p>
           )}

@@ -99,7 +99,7 @@ export default function AllPage() {
         <PhoneBar
           back={{ to: "/all", label: "すべて" }}
           center={
-            <button type="button" onClick={(event) => openSearch(f.q ?? "", event.currentTarget)} className="flex h-11 min-w-0 max-w-full items-center gap-2 rounded-full bg-bg-sunk px-3.5 text-[15px] text-ink ring-1 ring-inset ring-line-soft dark:bg-bg-muted/60">
+            <button type="button" onClick={(event) => openSearch(f.q ?? "", event.currentTarget)} className="flex h-11 min-w-0 max-w-full items-center gap-2 bg-bg-sunk px-3.5 text-[15px] text-ink ring-1 ring-inset ring-line-soft dark:bg-bg-muted/60">
               <IconSearch size={16} className="shrink-0 text-ink-4" />
               <span className="truncate">{f.q}</span>
             </button>
@@ -113,7 +113,7 @@ export default function AllPage() {
       {/* Desktop, as on 厳選: the title with the AI score floor on the right, then one filter row with the search field aligned on the right. */}
       <div className="hidden lg:block">
         <div className="flex items-center justify-between gap-4">
-          <h1 className="text-[24px] font-semibold leading-[1.3] text-ink">{title ?? ALL_TITLE}</h1>
+          <h1 className="t-display text-[28px] leading-[1.15] text-ink lg:text-[34px]">{title ?? ALL_TITLE}</h1>
           <ScoreTabs minScore={f.minScore} layoutId="all-score-desk" />
         </div>
         <div className="mb-5 mt-4 flex items-center justify-between gap-4">
@@ -181,7 +181,7 @@ export function SearchBusy() {
   const base = pathname.startsWith("/all") ? "/all" : "/";
   const retry = kept.toString() ? `${base}?${kept}` : base;
   const hasSearch = kept.has("q");
-  const button = "inline-flex h-9 items-center rounded-full px-4 text-[13.5px]";
+  const button = "inline-flex h-9 items-center px-4 text-[13.5px]";
   return (
     <>
     <PhoneBar back={{ to: base, label: base === "/all" ? "すべて" : "厳選" }} />
@@ -194,9 +194,9 @@ export function SearchBusy() {
           (wait > 0 ? (
             <span aria-disabled="true" className={`${button} num cursor-default bg-bg-sunk font-medium text-ink-4`}>{wait} 秒後に再試行できます</span>
           ) : (
-            <Link to={retry} className={`${button} bg-accent font-medium text-accent-contrast hover:bg-accent-ink`}>この検索をもう一度</Link>
+            <Link to={retry} className={`${button} signal-face font-semibold`}>この検索をもう一度</Link>
           ))}
-        <Link to="/all" className={`${button} ${hasSearch ? "border border-line-strong bg-surface text-ink-2 hover:border-ink-4" : "bg-accent font-medium text-accent-contrast hover:bg-accent-ink"}`}>すべてのニュースを見る</Link>
+        <Link to="/all" className={`${button} ${hasSearch ? "plate text-ink-2" : "signal-face font-semibold"}`}>すべてのニュースを見る</Link>
         <Link to="/" className={`${button} border border-line-strong bg-surface text-ink-2 hover:border-ink-4`}>厳選に戻る</Link>
       </div>
     </div>

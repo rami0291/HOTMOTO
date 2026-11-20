@@ -116,7 +116,7 @@ export default function AgentPage() {
   };
   const track = TRACKS.find((t) => t.key === tab);
 
-  const chip = "inline-flex h-7 items-center gap-1.5 rounded-full border border-line bg-surface px-2.5 text-[12px] text-ink-3";
+  const chip = "inline-flex h-7 items-center gap-1.5 border border-line bg-surface px-2.5 text-[12px] text-ink-3";
   const aside = (
     <>
       <AsideCard title="接続方法" className="hidden lg:block">
@@ -133,11 +133,11 @@ export default function AgentPage() {
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
                 aria-current={on ? "true" : undefined}
-                className={`flex items-center gap-2.5 rounded-control px-2 py-2 text-[13.5px] transition-colors ${on ? "bg-accent-soft font-medium text-accent" : "text-ink-2 hover:bg-bg-sunk hover:text-ink"}`}
+                className={`flex items-center gap-2.5 px-2 py-2 text-[13.5px] transition-colors ${on ? "bg-accent-soft font-medium text-accent" : "text-ink-2 hover:bg-bg-sunk hover:text-ink"}`}
               >
                 <t.icon size={16} />
                 <span className="min-w-0 flex-1">{t.name}</span>
-                {on && <span className="size-1.5 rounded-full bg-accent" aria-hidden="true" />}
+                {on && <span className="size-1.5 bg-accent" aria-hidden="true" />}
               </a>
             );
           })}
@@ -146,7 +146,7 @@ export default function AgentPage() {
       <AsideCard title="接続の資料">
         <nav aria-label="接続の資料" className="-mx-2 -mb-1">
           {RESOURCES.map(([l, h, note]) => (
-            <a key={h} href={h} target={h.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer" className="group flex items-start gap-2 rounded-control px-2 py-2 transition-colors hover:bg-bg-sunk">
+            <a key={h} href={h} target={h.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer" className="group flex items-start gap-2 px-2 py-2 transition-colors hover:bg-bg-sunk">
               <span className="min-w-0 flex-1">
                 <span className="block text-[13.5px] text-ink-2 group-hover:text-ink">{l}</span>
                 <span className="mt-0.5 block text-[12px] text-ink-4">{note}</span>
@@ -175,7 +175,7 @@ export default function AgentPage() {
         <p className="mt-3 max-w-[40em] text-[15px] leading-[1.8] text-ink-3">{`${TRACKS.map((t) => t.short).join("、")} の${WAYS}の方法は、どれも同じデータを読みます：厳選、話題、日報、週報、月報。使うツールに合わせて 1 つ選ぶだけです。すべて匿名・読み取り専用で、登録も API キーも不要です。`}</p>
         <div className="mt-4 flex flex-wrap items-center gap-2">
           <span className={`${chip} ${healthy ? "text-ok" : "text-hot"}`}>
-            <span className={`size-1.5 rounded-full ${healthy ? "bg-ok" : "bg-hot"}`} aria-hidden="true" />
+            <span className={`size-1.5 ${healthy ? "bg-ok" : "bg-hot"}`} aria-hidden="true" />
             {healthy ? "サービス正常" : "サービス異常"}
           </span>
           <span className={chip}>バージョン <span className="mono text-ink-2">{V}</span></span>
@@ -200,13 +200,13 @@ export default function AgentPage() {
                 e.preventDefault();
                 select(t.key);
               }}
-              className={`group flex flex-col rounded-card border p-3.5 transition-[border-color,background-color,box-shadow] duration-200 sm:p-4 ${on ? "neu-inset border-transparent" : "border-edge bg-surface shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)]"}`}
+              className={`group flex flex-col border p-3.5 transition-[border-color,background-color,box-shadow] duration-200 sm:p-4 ${on ? "sunk border-transparent" : "border-frame bg-surface "}`}
             >
               <span className="flex items-center justify-between gap-2">
-                <span className={`grid size-9 place-items-center rounded-control transition-colors ${on ? "bg-accent text-accent-contrast" : "bg-bg-sunk text-ink-3 group-hover:text-ink"}`}>
+                <span className={`grid size-9 place-items-center transition-colors ${on ? "mass-face" : "bg-bg-sunk text-ink-3 group-hover:text-ink"}`}>
                   <t.icon size={18} />
                 </span>
-                {t.badge && <span className="inline-flex h-[18px] items-center rounded-full bg-accent-soft px-2 text-[11px] font-medium text-accent">{t.badge}</span>}
+                {t.badge && <span className="inline-flex h-[18px] items-center bg-accent-soft px-2 text-[11px] font-medium text-accent">{t.badge}</span>}
               </span>
               <span className="mt-3 text-[15.5px] font-semibold text-ink">{t.name}</span>
               <span className="mt-1 text-[13px] leading-snug text-ink-2">{t.pitch}</span>

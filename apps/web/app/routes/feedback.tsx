@@ -162,14 +162,14 @@ export default function FeedbackPage() {
     return (
       <ReadingLayout>
         <div className="card px-6 py-14 text-center">
-          <div className="anim-pop-in mx-auto flex size-14 items-center justify-center rounded-full bg-accent text-accent-contrast">
+          <div className="anim-pop-in mx-auto flex size-14 items-center justify-center border-2 border-mass bg-signal text-on-signal">
             <IconCheck size={26} />
           </div>
           <h1 className="mt-6 text-[22px] font-semibold text-ink">受け付けました。ありがとうございます</h1>
           <p className="mt-2 text-[14px] text-ink-3">
             受付番号 <span className="mono font-semibold text-ink">#{state.id}</span>。返信が必要なときはこの番号でご連絡します。
           </p>
-          <Link to="/" className="mt-8 inline-flex h-10 items-center rounded-full bg-ink px-6 text-[14px] font-medium text-bg transition-opacity hover:opacity-90">
+          <Link to="/" className="mt-8 inline-flex h-10 items-center bg-ink px-6 text-[14px] font-medium text-bg transition-opacity hover:opacity-90">
             厳選に戻る
           </Link>
         </div>
@@ -177,7 +177,7 @@ export default function FeedbackPage() {
     );
   }
 
-  const field = "w-full rounded-card bg-bg-sunk text-ink outline-none ring-1 ring-inset ring-line-soft transition-[background-color,box-shadow] placeholder:text-ink-4 hover:ring-line-strong focus:bg-surface focus:shadow-[0_0_0_3px_var(--accent-soft)] focus:ring-accent dark:bg-bg-muted/60 dark:focus:bg-surface";
+  const field = "w-full bg-bg-sunk text-ink outline-none ring-1 ring-inset ring-line-soft transition-[background-color,box-shadow] placeholder:text-ink-4 hover:ring-line-strong focus:bg-surface focus:ring-accent dark:bg-bg-muted/60 dark:focus:bg-surface";
   const label = "mb-2 block text-[13px] font-semibold text-ink";
   const canSend = draft.content.trim().length >= 2 && state.kind !== "sending";
   return (
@@ -185,7 +185,7 @@ export default function FeedbackPage() {
     <PhoneBar back={{ to: "/more", label: "マイページ" }} title="フィードバック" />
     <ReadingLayout aside={<FeedbackAside />}>
       <header>
-        <h1 data-page-title="" className="text-[24px] font-semibold leading-[1.3] text-ink">ご意見をお聞かせください</h1>
+        <h1 data-page-title="" className="t-display text-[28px] leading-[1.15] text-ink lg:text-[34px]">ご意見をお聞かせください</h1>
         <p className="mt-2 text-[14.5px] leading-relaxed text-ink-3">不具合、欲しい機能、気になるところ、何でも教えてください。すべて目を通します。</p>
       </header>
 
@@ -203,7 +203,7 @@ export default function FeedbackPage() {
           setDragging(false);
           pick(e.dataTransfer.files[0]);
         }}
-        className={`card mt-6 overflow-hidden transition-shadow ${dragging ? "shadow-[0_0_0_3px_var(--accent-soft)] ring-1 ring-accent" : ""}`}
+        className={`card mt-6 overflow-hidden transition-shadow ${dragging ? "ring-1 ring-accent" : ""}`}
       >
         <div className="space-y-5 p-5 sm:p-6">
           <div>
@@ -239,13 +239,13 @@ export default function FeedbackPage() {
               スクリーンショット <span className="font-normal text-ink-4">（任意）</span>
             </span>
             {shot ? (
-              <div className="flex items-center gap-4 well rounded-card p-3">
-                <img src={shot.url} alt="スクリーンショットのプレビュー" className="h-16 w-24 shrink-0 rounded-control border border-line bg-surface object-cover" />
+              <div className="flex items-center gap-4 well p-3">
+                <img src={shot.url} alt="スクリーンショットのプレビュー" className="h-16 w-24 shrink-0 border border-line bg-surface object-cover" />
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-[13px] font-medium text-ink-2">{shot.file.name}</div>
                   <div className="mono mt-0.5 text-[11.5px] text-ink-4">{(shot.file.size / 1024 / 1024).toFixed(2)} MB</div>
                 </div>
-                <button type="button" aria-label="スクリーンショットを外す" onClick={() => setShot(null)} className="grid size-8 shrink-0 place-items-center rounded-full text-ink-4 transition-colors hover:bg-surface hover:text-ink">
+                <button type="button" aria-label="スクリーンショットを外す" onClick={() => setShot(null)} className="grid size-8 shrink-0 place-items-center text-ink-4 transition-colors hover:bg-surface hover:text-ink">
                   <IconClose size={15} />
                 </button>
               </div>
@@ -253,9 +253,9 @@ export default function FeedbackPage() {
               <button
                 type="button"
                 onClick={() => fileRef.current?.click()}
-                className={`group flex w-full items-center gap-3.5 rounded-card border border-dashed px-4 py-3.5 text-left transition-colors ${dragging ? "border-accent bg-accent-softer" : "border-line-strong hover:border-ink-4 hover:bg-bg-sunk/60"}`}
+                className={`group flex w-full items-center gap-3.5 border border-dashed px-4 py-3.5 text-left transition-colors ${dragging ? "border-accent bg-bg-sunk" : "border-line-strong hover:border-ink-4 hover:bg-bg-sunk/60"}`}
               >
-                <span className="grid size-10 shrink-0 place-items-center well rounded-tile text-ink-3 transition-colors group-hover:text-accent">
+                <span className="grid size-10 shrink-0 place-items-center well text-ink-3 transition-colors group-hover:text-accent">
                   <IconImage size={19} />
                 </span>
                 <span className="min-w-0">
@@ -268,7 +268,7 @@ export default function FeedbackPage() {
           </div>
 
           <Presence show={state.kind === "error"} enter="anim-notice-in" exit="anim-fade-out" duration={160}>
-            <p role="alert" className="rounded-tile bg-hot-soft px-3.5 py-2.5 text-[13px] text-hot">
+            <p role="alert" className="bg-hot-soft px-3.5 py-2.5 text-[13px] text-hot">
               {state.kind === "error" ? state.message : ""}
             </p>
           </Presence>
@@ -285,7 +285,7 @@ export default function FeedbackPage() {
           <button
             type="submit"
             disabled={!canSend}
-            className="inline-flex h-10 shrink-0 items-center justify-center gap-2 self-start rounded-full bg-accent px-6 text-[14px] font-medium text-accent-contrast transition-[background-color,opacity] hover:bg-accent-ink disabled:bg-line-strong disabled:text-ink-4 sm:self-auto"
+            className="inline-flex h-10 shrink-0 items-center justify-center gap-2 self-start signal-face px-6 text-[14px] font-semibold disabled:opacity-50 sm:self-auto"
           >
             {state.kind === "sending" && <RingMark className="size-4" spinning />}
             フィードバックを送信

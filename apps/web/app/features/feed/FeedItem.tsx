@@ -39,10 +39,10 @@ export const FeedItem = memo(function FeedItem({ item, group, filters, read = fa
 
   return (
     <article className="relative min-w-0 lg:card lg:card-hover lg:px-[18px] lg:pb-[14px] lg:pt-[15px]" data-item-id={item.id}>
-      <header className="flex min-h-[22px] items-center gap-1.5 text-[12.5px] leading-[18px] text-ink-4 lg:min-h-[18px] lg:gap-2">
+      <header className="flex min-h-[22px] items-center gap-1.5 font-tech text-[12.5px] font-semibold leading-[18px] tracking-[0.03em] text-ink-4 lg:min-h-[18px] lg:gap-2">
         <SourceLine item={item} className="text-ink-4" />
         {at && (
-          <time dateTime={at} className="mono shrink-0 text-[12px] lg:hidden">
+          <time dateTime={at} className="t-data shrink-0 text-[12px] font-normal lg:hidden">
             · {siteTime(at)}
           </time>
         )}
@@ -115,9 +115,9 @@ export const FeedItem = memo(function FeedItem({ item, group, filters, read = fa
 
       {/* The model's one line on why it matters, as a note pressed into the card. */}
       {item.reason && (
-        <div className="mt-1 flex items-start gap-1.5 lg:well lg:mt-3 lg:gap-2 lg:rounded-tile lg:px-3 lg:py-2.5">
+        <div className="mt-1 flex items-start gap-1.5 lg:well lg:mt-3 lg:gap-2 lg:px-3 lg:py-2.5">
           <IconSparkles size={13} strokeWidth={2} className="mt-[4px] shrink-0 text-accent lg:mt-[5px]" />
-          <p className="line-clamp-1 min-w-0 text-[13px] leading-[1.65] text-note lg:line-clamp-none lg:leading-[1.75]">
+          <p className="line-clamp-1 min-w-0 text-[13px] leading-[1.65] text-ink-3 lg:line-clamp-none lg:leading-[1.75]">
             <span className="font-semibold text-accent">{`${ITEM_COPY.reasonLabel}：`}</span>
             {item.reason}
           </p>

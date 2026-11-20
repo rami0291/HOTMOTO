@@ -32,11 +32,11 @@ export function MediaThumbs({ media, className = "" }: { media: MediaView[]; cla
       {shown.map((m) => {
         const Wrapper = m.kind === "image" ? "button" : "span";
         return (
-        <Wrapper key={m.url} {...(m.kind === "image" ? { type: "button" as const, "aria-label": `画像を見る${m.alt ? `：${m.alt}` : ""}`, onClick: (e: React.MouseEvent) => { e.preventDefault(); e.stopPropagation(); setIndex(images.findIndex((image) => image.src === (m.fullUrl ?? m.url))); } } : {})} className={`relative ${m.kind === "image" ? "z-10 cursor-zoom-in" : ""} shrink-0 overflow-hidden rounded-control bg-bg-sunk shadow-[var(--shadow-thumb)] ${shown.length === 1 ? "max-w-[240px]" : "w-[112px]"}`}>
+        <Wrapper key={m.url} {...(m.kind === "image" ? { type: "button" as const, "aria-label": `画像を見る${m.alt ? `：${m.alt}` : ""}`, onClick: (e: React.MouseEvent) => { e.preventDefault(); e.stopPropagation(); setIndex(images.findIndex((image) => image.src === (m.fullUrl ?? m.url))); } } : {})} className={`relative ${m.kind === "image" ? "z-10 cursor-zoom-in" : ""} shrink-0 overflow-hidden bg-bg-sunk ${shown.length === 1 ? "max-w-[240px]" : "w-[112px]"}`}>
           <img src={m.poster ?? m.url} srcSet={m.srcSet} sizes={shown.length === 1 ? `${m.width && m.height ? Math.min(240, Math.ceil(112 * m.width / m.height)) : 240}px` : "112px"} width={m.width ?? undefined} height={m.height ?? undefined} alt={m.alt ?? ""} loading="lazy" decoding="async" className={`h-[112px] object-cover ${shown.length === 1 ? "w-auto max-w-[240px]" : "w-[112px]"}`} />
           {m.kind === "video" && (
             <span className="absolute inset-0 grid place-items-center" aria-hidden="true">
-              <span className="grid size-8 place-items-center rounded-full bg-black/55 text-white">
+              <span className="grid size-8 place-items-center bg-black/55 text-white">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className="ml-px">
                   <path d="M7 4.5v15a1 1 0 001.5.87l13-7.5a1 1 0 000-1.74l-13-7.5A1 1 0 007 4.5z" />
                 </svg>
@@ -82,7 +82,7 @@ export function StarButton({ item, size, className = "size-[26px]" }: { item: St
         toggle();
       }}
       style={size ? { width: size, height: size } : undefined}
-      className={`relative z-10 inline-flex shrink-0 items-center justify-center rounded-control transition-colors duration-150 ${on ? "text-accent" : "text-ink-4 hover:text-accent lg:hover:shadow-[var(--shadow-thumb)]"} ${className}`}
+      className={`relative z-10 inline-flex shrink-0 items-center justify-center transition-colors duration-150 ${on ? "text-accent" : "text-ink-4 hover:text-accent"} ${className}`}
     >
       <span key={pulse} className={`flex ${pulse ? "anim-bump" : ""}`}>
         <IconBookmark size={size ? Math.round(size * 0.6) : 16} filled={on} />
