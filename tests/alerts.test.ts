@@ -7,6 +7,7 @@ import { closeDb, sql } from "@hotmoto/backend/db";
 import { upsertMaterial } from "@hotmoto/backend/content/materials";
 import { getBoss, stopBoss } from "@hotmoto/backend/jobs/queue";
 import { checkAlerts, collectFindings, sendDigest } from "@hotmoto/backend/operations/alerts";
+import { AUTO_RELEASE_NOTE } from "@hotmoto/backend/operations/recover";
 import { runsOverview } from "@hotmoto/backend/admin/runs";
 
 process.env.COLLECT_ENABLED = "false";
@@ -115,8 +116,8 @@ test("selected identity delays show reader impact, recovery state and the affect
     await make("group-alert-failed", 20, "failed");
     let warning = await finding();
     assert.equal(warning?.level, "now");
-    assert.match(warning!.impact!, /1 条.*精选/);
-    assert.match(warning!.heals!, /人工|处理后/);
+    assert.match(warning!.impact!, /1 件.*厳選/);
+    assert.match(warning!.heals!, /人の手/);
     assert.match(warning!.detail!, /group-alert-failed/);
     const runs = await runsOverview();
     assert.equal(runs.grouping.waiting, 3, "the runs page includes normal waits but no false candidates");
@@ -127,12 +128,12 @@ test("selected identity delays show reader impact, recovery state and the affect
       VALUES('group-alert-receipt','deepseek','event_identity','article:group-alert-failed','unknown') RETURNING id`;
     await sql`UPDATE articles SET grouping_receipt_id=${receipt!.id} WHERE id='group-alert-failed'`;
     warning = await finding();
-    assert.match(warning!.heals!, /自动/);
-    assert.match(warning!.heals!, /30 分钟/);
+    assert.match(warning!.heals!, /自動/);
+    assert.match(warning!.heals!, /30 分/);
     await sql`INSERT INTO receipt_attempts(receipt_id,service,attempt,status,error)
-      VALUES(${receipt!.id},'deepseek',1,'failed','自动放行：结果未知超过 30 分钟，未核对是否计费')`;
+      VALUES(${receipt!.id},'deepseek',1,'failed',${AUTO_RELEASE_NOTE})`;
     warning = await finding();
-    assert.match(warning!.heals!, /人工|处理后/);
+    assert.match(warning!.heals!, /人の手/);
     assert.match(warning!.detail!, new RegExp(`#${receipt!.id}`));
 
     await sql`UPDATE articles SET grouping_status='complete',grouped_at=now(),grouping_receipt_id=NULL WHERE id='group-alert-failed'`;
@@ -159,8 +160,8 @@ test("the ops digest does not describe unknown paid work as harmless or already 
     console.log = (value: unknown) => { lines.push(String(value)); };
     await sendDigest();
     const message = lines.join("\n");
-    assert.match(message, /结果.*未知|结果.*确认/);
-    assert.doesNotMatch(message, /以下事项不影响读者|自动重试过一次/);
+    assert.match(message, /結果.*確認/);
+    assert.doesNotMatch(message, /読者に影響しない|読者には影響|自動で 1 回再試行|再試行済み/);
   } finally {
     console.log = log;
     if (enabled === undefined) delete process.env.FEISHU_INTERNAL_ENABLED;

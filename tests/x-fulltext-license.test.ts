@@ -6,6 +6,7 @@ import { tag } from "./setup.ts";
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { after, test } from "node:test";
+import { SITE_LANGUAGE } from "@hotmoto/contracts/language";
 import { closeDb, sql } from "@hotmoto/backend/db";
 import { updateSource } from "@hotmoto/backend/admin/sources";
 import { upsertMaterial, type XPostData } from "@hotmoto/backend/content/materials";
@@ -74,8 +75,8 @@ async function fixture(options: {
   await sql`INSERT INTO analyses (article_id, input_revision, origin, relevance, category, title_zh, summary_zh, reason_zh, tags, score, selected)
     VALUES (${id}, 1, 'rule', 'pass', 'new-models', ${`标题-${key}`}, ${summary}, '推荐理由', ${[T, key]}, 90, true)`;
   if (options.translation !== "missing") {
-    await sql`INSERT INTO translations (article_id, revision, body_text, body_html, origin)
-      VALUES (${id}, ${options.translation === "stale" ? 0 : 1}, ${zh}, ${`<p>${zh}</p>`}, 'source')`;
+    await sql`INSERT INTO translations (article_id, lang, revision, body_text, body_html, origin)
+      VALUES (${id}, ${SITE_LANGUAGE}, ${options.translation === "stale" ? 0 : 1}, ${zh}, ${`<p>${zh}</p>`}, 'source')`;
   }
   await sql`INSERT INTO quote_translations (tweet_id, text_hash, text_zh, origin) VALUES (${quote}, ${key}, ${quotedZh}, 'reused')`;
   const story = randomUUID();

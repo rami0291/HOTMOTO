@@ -88,7 +88,7 @@ test("an article goes through the agent step by step and is judged from its answ
   assert.equal(res!.output!.score, SELECTING_SCORE);
   assert.equal(res!.output!.titleZh, "エージェントが書いたタイトル");
   const services = await sql<{ service: string; status: string }[]>`SELECT DISTINCT service, status FROM receipts WHERE subject LIKE ${`article:${id}%`}`;
-  assert.deepEqual(services, [{ service: "agent", status: "completed" }]);
+  assert.deepEqual([...services], [{ service: "agent", status: "completed" }]);
   assert.deepEqual(await tasksOf(id), [], "answered tasks are gone");
 });
 
