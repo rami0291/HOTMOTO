@@ -19,7 +19,8 @@ export function ReadingLayout({ children, aside }: { children: ReactNode; aside?
 }
 
 /**
- * Long reads (articles, terms, privacy): no sheet, the text sits on the page in a column of at most
+ * Long reads (articles, terms, privacy): the text sits on a card (so the backdrop drawing stays off the
+ * words) in a column of at most
  * 760px, the width CJK magazines and news sites use (680–730px at 16–17px, about 42 characters a
  * line). From 2xl a rail on each side (the piece's facts left, notes right) keeps the page filling a
  * 16:9 screen with the column in the middle; from lg only the right rail shows, beside the centred
@@ -29,13 +30,13 @@ export function ArticleLayout({ children, left, right }: { children: ReactNode; 
   return (
     <div className="mx-auto grid max-w-[var(--page-max-reading)] grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_240px] lg:gap-x-12 2xl:grid-cols-[minmax(200px,1fr)_minmax(0,760px)_minmax(200px,1fr)] 2xl:gap-x-12">
       <aside className="hidden 2xl:block">
-        <div className="sticky top-6 max-w-[260px] space-y-8">{left}</div>
+        <div className="card sticky top-6 max-w-[260px] space-y-8 p-5">{left}</div>
       </aside>
       <div className="min-w-0">
-        <div className="mx-auto max-w-[760px]">{children}</div>
+        <div className="card mx-auto max-w-[760px] px-4 py-4 lg:px-8 lg:py-6">{children}</div>
       </div>
       <aside className="hidden lg:block">
-        <div className="sticky top-6 ml-auto max-w-[260px] space-y-8">{right}</div>
+        <div className="card sticky top-6 ml-auto max-w-[260px] space-y-8 p-5">{right}</div>
       </aside>
     </div>
   );
